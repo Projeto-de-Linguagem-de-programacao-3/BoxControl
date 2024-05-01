@@ -1,5 +1,5 @@
 package main.model.entity;
 
-public class Balanco {
+public class DadosBalanco {
   
 }

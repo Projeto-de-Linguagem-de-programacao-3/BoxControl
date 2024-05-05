@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 
 import main.model.entity.DadosProduto;
 import main.view.components.StyleGuide;
+import java.awt.Font;
 
 public class ProdutoPrincipal extends JPanel {
   private JTextField txtNome;
@@ -27,68 +28,75 @@ public class ProdutoPrincipal extends JPanel {
     setLayout(null);
 
     JLabel lblNome = new JLabel("Nome:");
-    lblNome.setBounds(20, 20, 120, 20);
+    lblNome.setFont(new Font("Tahoma", Font.PLAIN, 14));
+    lblNome.setBounds(20, 3, 120, 20);
     add(lblNome);
 
     txtNome = new JTextField();
-    txtNome.setBounds(150, 20, 200, 20);
+    txtNome.setBounds(20, 26, 200, 20);
     add(txtNome);
 
     JLabel lblTipo = new JLabel("Tipo:");
-    lblTipo.setBounds(20, 50, 120, 20);
+    lblTipo.setFont(new Font("Tahoma", Font.PLAIN, 14));
+    lblTipo.setBounds(20, 49, 120, 20);
     add(lblTipo);
 
     txtTipo = new JTextField();
-    txtTipo.setBounds(150, 50, 200, 20);
+    txtTipo.setBounds(20, 72, 200, 20);
     add(txtTipo);
 
     JLabel lblPrecoCompra = new JLabel("Preço de Compra:");
-    lblPrecoCompra.setBounds(20, 80, 120, 20);
+    lblPrecoCompra.setFont(new Font("Tahoma", Font.PLAIN, 14));
+    lblPrecoCompra.setBounds(20, 95, 120, 20);
     add(lblPrecoCompra);
 
     txtPrecoCompra = new JTextField();
-    txtPrecoCompra.setBounds(150, 80, 200, 20);
+    txtPrecoCompra.setBounds(20, 118, 200, 20);
     add(txtPrecoCompra);
 
     ((AbstractDocument) txtPrecoCompra.getDocument()).setDocumentFilter(new NumericFilter());
 
     JLabel lblPrecoVenda = new JLabel("Preço de Venda:");
-    lblPrecoVenda.setBounds(20, 110, 120, 20);
+    lblPrecoVenda.setFont(new Font("Tahoma", Font.PLAIN, 14));
+    lblPrecoVenda.setBounds(20, 141, 120, 20);
     add(lblPrecoVenda);
 
     txtPrecoVenda = new JTextField();
-    txtPrecoVenda.setBounds(150, 110, 200, 20);
+    txtPrecoVenda.setBounds(20, 164, 200, 20);
     add(txtPrecoVenda);
     ((AbstractDocument) txtPrecoVenda.getDocument()).setDocumentFilter(new NumericFilter());
 
     JLabel lblFabricante = new JLabel("Fabricante:");
-    lblFabricante.setBounds(20, 140, 120, 20);
+    lblFabricante.setFont(new Font("Tahoma", Font.PLAIN, 14));
+    lblFabricante.setBounds(20, 187, 120, 20);
     add(lblFabricante);
 
     txtFabricante = new JTextField();
-    txtFabricante.setBounds(150, 140, 200, 20);
+    txtFabricante.setBounds(20, 210, 200, 20);
     add(txtFabricante);
 
     JLabel lblValidade = new JLabel("Validade:");
-    lblValidade.setBounds(20, 170, 120, 20);
+    lblValidade.setFont(new Font("Tahoma", Font.PLAIN, 14));
+    lblValidade.setBounds(20, 233, 120, 20);
     add(lblValidade);
 
     txtValidade = new JTextField();
-    txtValidade.setBounds(150, 170, 200, 20);
+    txtValidade.setBounds(20, 256, 200, 20);
     add(txtValidade);
     ((AbstractDocument) txtValidade.getDocument()).setDocumentFilter(new NumericFilter());
 
     JLabel lblQuantidadeEstoque = new JLabel("Quantidade em Estoque:");
-    lblQuantidadeEstoque.setBounds(20, 200, 150, 20);
+    lblQuantidadeEstoque.setFont(new Font("Tahoma", Font.PLAIN, 14));
+    lblQuantidadeEstoque.setBounds(20, 279, 183, 20);
     add(lblQuantidadeEstoque);
 
     txtQuantidadeEstoque = new JTextField();
-    txtQuantidadeEstoque.setBounds(180, 200, 170, 20);
+    txtQuantidadeEstoque.setBounds(20, 302, 170, 20);
     add(txtQuantidadeEstoque);
     ((AbstractDocument) txtQuantidadeEstoque.getDocument()).setDocumentFilter(new NumericFilter());
 
     JButton btnSalvar = new JButton("Salvar em Texto");
-    btnSalvar.setBounds(150, 230, 150, 30);
+    btnSalvar.setBounds(20, 325, 150, 20);
     btnSalvar.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         salvarProduto();

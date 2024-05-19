@@ -1,144 +1,199 @@
 package main.view.screens.TelasPrincipais;
 
 import javax.swing.*;
+import javax.swing.table.*;
 import javax.swing.text.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import main.view.components.StyleGuide;
-import main.model.entity.DadosCliente;
-import java.awt.Font;
+import main.controller.actions.ButtonClientesSalvarListener;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.text.ParseException;
-import javax.swing.text.MaskFormatter;
 
 public class ClientePrincipal extends JPanel {
-  private JTextField Nome;
-  private JTextField CPF;
-  private JTextField RG;
-  private JFormattedTextField DataNascimento;
-  private JFormattedTextField LimiteCredito;
+  private JLabel labelNome;
+  private JTextField textNome;
+  private JLabel labelCPF;
+  private JTextField textCPF;
+  private JLabel labelRG;
+  private JTextField textRG;
+  private JLabel labelNascimento;
+  private JFormattedTextField textNascimento;
+  private JLabel labelCredito;
+  private JTextField textCredito;
+  private JTable tabelaCliente;
+  private JButton btnSalvar;
 
   public ClientePrincipal() {
     super();
     setBackground(StyleGuide.bgScreen);
-    configurarComponentes();
+    setLayout(new GridBagLayout());
+    GridBagConstraints constraints = new GridBagConstraints();
+    constraints.weightx=1;
+    constraints.weighty=1;
+    constraints.fill=GridBagConstraints.HORIZONTAL;
+    constraints.insets = new Insets(10,10,10,10);
+
+    constraints.gridx=0; 
+    constraints.gridy=0; 
+    add(getLabelNome(),constraints);
+    constraints.gridx=0; 
+    constraints.gridy=1; 
+    add(getTextNome(), constraints);
+
+    constraints.gridx=0; 
+    constraints.gridy=2; 
+    add(getLabelCPF(), constraints);
+    constraints.gridx=0; 
+    constraints.gridy=3; 
+    add(getTextCPF(), constraints);
+
+    constraints.gridx=0; 
+    constraints.gridy=4; 
+    add(getLabelRG(), constraints);
+    constraints.gridx=0; 
+    constraints.gridy=5; 
+    add(getTextRG(), constraints);
+
+    constraints.gridx=0; 
+    constraints.gridy=6; 
+    add(getLabelNascimento(), constraints);
+    constraints.gridx=0; 
+    constraints.gridy=7; 
+    add(getTextNascimento(), constraints);
+
+    constraints.gridx=0; 
+    constraints.gridy=8; 
+    add(getLabelCredito(), constraints);
+    constraints.gridx=0;
+    constraints.gridy=9;
+    add(getTextCredito(), constraints);
+
+    constraints.gridx=0; 
+    constraints.gridy=10; 
+    constraints.gridwidth=2; // ocupa 2 colunas
+    add(getBtnSalvar(), constraints);
+    ButtonClientesSalvarListener buttonClientesSalvarListener = new ButtonClientesSalvarListener(this);
+    btnSalvar.addActionListener(buttonClientesSalvarListener);
+
+    constraints.gridx=2;
+    constraints.gridy=0;
+    constraints.gridwidth=2;
+    constraints.gridheight=5;
+    JScrollPane scrollPane = new JScrollPane(getTabelaCliente());
+    add(scrollPane, constraints);
   }
 
-  private void configurarComponentes() {
-    setLayout(null);
-
-    JLabel lblNome = new JLabel("Nome:");
-    lblNome.setFont(new Font("Tahoma", Font.PLAIN, 14));
-    lblNome.setBounds(20, 6, 120, 20);
-    add(lblNome);
-
-    Nome = new JTextField();
-    Nome.setBounds(20, 32, 200, 20);
-    add(Nome);
-
-    JLabel lblCPF = new JLabel("CPF:");
-    lblCPF.setFont(new Font("Tahoma", Font.PLAIN, 14));
-    lblCPF.setBounds(20, 58, 120, 20);
-    add(lblCPF);
-
-    CPF = new JTextField();
-    CPF.setBounds(20, 84, 200, 20);
-    add(CPF);
-    // Definir o DocumentFilter para permitir apenas números no campo CPF e limitar
-    // a 11 caracteres
-    ((AbstractDocument) CPF.getDocument()).setDocumentFilter(new NumericFilter(11));
-
-    JLabel lblRG = new JLabel("RG:");
-    lblRG.setFont(new Font("Tahoma", Font.PLAIN, 14));
-    lblRG.setBounds(20, 110, 120, 20);
-    add(lblRG);
-
-    RG = new JTextField();
-    RG.setBounds(20, 136, 200, 20);
-    add(RG);
-    // Definir o DocumentFilter para permitir apenas números no campo RG
-    ((AbstractDocument) RG.getDocument()).setDocumentFilter(new NumericFilter(9));
-
-    JLabel lblDataNascimento = new JLabel("Data de Nascimento:");
-    lblDataNascimento.setFont(new Font("Tahoma", Font.PLAIN, 14));
-    lblDataNascimento.setBounds(20, 162, 150, 20);
-    add(lblDataNascimento);
-
-    try {
-      // Definir um MaskFormatter para o formato de data
-      MaskFormatter dateFormatter = new MaskFormatter("##/##/####");
-      DataNascimento = new JFormattedTextField(dateFormatter);
-    } catch (ParseException e) {
-      e.printStackTrace();
+  public JLabel getLabelNome() {
+    if (labelNome == null) {
+        labelNome = new JLabel("Nome:");
+        StyleGuide.formataComponente(labelNome);
     }
-    DataNascimento.setBounds(20, 188, 200, 20);
-    add(DataNascimento);
+    return labelNome;
+}
 
-    JLabel lblLimiteCredito = new JLabel("Limite de Crédito:");
-    lblLimiteCredito.setFont(new Font("Tahoma", Font.PLAIN, 14));
-    lblLimiteCredito.setBounds(20, 214, 120, 20);
-    add(lblLimiteCredito);
+  public JTextField getTextNome() {
+    if (textNome == null) {
+        textNome = new JTextField(20); // Ajustar o tamanho como desejado
+        StyleGuide.formataComponente(textNome);
+    }
+    return textNome;
+}
 
-    LimiteCredito = new JFormattedTextField();
-    LimiteCredito.setBounds(20, 240, 200, 20);
-    add(LimiteCredito);
+public JLabel getLabelCPF() {
+    if (labelCPF == null) {
+        labelCPF = new JLabel("CPF:");
+        StyleGuide.formataComponente(labelCPF);
+    }
+    return labelCPF;
+}
 
-    ((AbstractDocument) LimiteCredito.getDocument()).setDocumentFilter(new NumericFilter(20));
+public JTextField getTextCPF() {
+    if (textCPF == null) {
+        textCPF = new JTextField(); // Ajustar o tamanho como desejado
+        ((AbstractDocument) textCPF.getDocument()).setDocumentFilter(new NumericFilter(11));
+        StyleGuide.formataComponente(textCPF);
+    }
+    return textCPF;
+}
 
-    JButton btnSalvar = new JButton("Salvar em Texto");
-    btnSalvar.setBounds(20, 266, 150, 20);
-    btnSalvar.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        salvarCliente();
+public JLabel getLabelRG() {
+    if (labelRG == null) {
+        labelRG = new JLabel("RG:");
+        StyleGuide.formataComponente(labelRG);
+    }
+    return labelRG;
+}
+
+public JTextField getTextRG() {
+    if (textRG == null) {
+        textRG = new JTextField(); // Ajustar o tamanho como desejado
+        ((AbstractDocument) textRG.getDocument()).setDocumentFilter(new NumericFilter(9));
+        StyleGuide.formataComponente(textRG);
       }
-    });
-    add(btnSalvar);
+    return textRG;
+}
+
+public JLabel getLabelNascimento() {
+    if (labelNascimento == null) {
+        labelNascimento = new JLabel("Nascimento:");
+        StyleGuide.formataComponente(labelNascimento);
+    }
+    return labelNascimento;
+}
+
+public JFormattedTextField getTextNascimento() {
+    if (textNascimento == null) {
+        textNascimento = new JFormattedTextField();
+        try {
+          // Definir um MaskFormatter para o formato de data
+          MaskFormatter dateFormatter = new MaskFormatter("##/##/####");
+          textNascimento = new JFormattedTextField(dateFormatter);
+        } catch (ParseException e) {
+          e.printStackTrace();
+        }
+        StyleGuide.formataComponente(textNascimento);
+    }
+    return textNascimento;
+}
+
+public JLabel getLabelCredito() {
+    if (labelCredito == null) {
+        labelCredito = new JLabel("Crédito:");
+        StyleGuide.formataComponente(labelCredito);
+    }
+    return labelCredito;
+}
+
+public JTextField getTextCredito() {
+    if (textCredito == null) {
+        textCredito = new JTextField();
+        ((AbstractDocument) textCredito.getDocument()).setDocumentFilter(new NumericFilter(20));
+        StyleGuide.formataComponente(textCredito);
+    }
+    return textCredito;
+}
+
+public JButton getBtnSalvar() {
+  if(btnSalvar == null) {
+    btnSalvar = new JButton("Salvar cliente");
+    StyleGuide.formataComponente(btnSalvar);
   }
+  return btnSalvar;
+}
 
-  private void salvarCliente() {
-    // Obter os dados inseridos pelo usuário
-    String nome = Nome.getText();
-    String cpf = CPF.getText();
-    String rg = RG.getText();
-    String dataNascimento = DataNascimento.getText();
-    String limiteCreditoText = LimiteCredito.getText(); // Obter o texto do limite de crédito
-
-    // Verificar se o CPF tem exatamente 8 caracteres
-    // também tem que colocar os para valores menor
-    if (cpf.length() != 8) {
-      JOptionPane.showMessageDialog(this, "O CPF deve ter exatamente 8 números.", "Erro de validação",
-          JOptionPane.ERROR_MESSAGE);
-      return;
-    }
-
-    // Verificar se o RG tem exatamente 9 caracteres
-    // também tem que colocar os para valores menor
-    if (rg.length() != 9) {
-      JOptionPane.showMessageDialog(this, "O RG deve ter exatamente 9 números.", "Erro de validação",
-          JOptionPane.ERROR_MESSAGE);
-      return;
-    }
-    // Verificar se o limite de crédito ultrapassa 100.000,00
-    if (!limiteCreditoText.isEmpty() && Double.parseDouble(limiteCreditoText) > 100000) {
-      JOptionPane.showMessageDialog(this, "O limite de crédito deve ser até 100.000,00.", "Erro de validação",
-          JOptionPane.ERROR_MESSAGE);
-      return;
-    }
-
-    // Converter o limite de crédito para double
-    double limiteCredito = Double.parseDouble(limiteCreditoText);
-
-    // Criar um objeto DadosCliente e definir os dados do cliente
-    DadosCliente cliente = new DadosCliente();
-    cliente.setNome(nome);
-    cliente.setCpf(cpf);
-    cliente.setRg(rg);
-    cliente.setDataNascimento(dataNascimento);
-    cliente.setLimiteCredito(limiteCredito);
-
-    // Chamar o método salvarTxt() para salvar os dados do cliente
-    String resultado = cliente.salvarTxt();
-    System.out.println(resultado);
+public JTable getTabelaCliente() {
+  if(tabelaCliente == null) {
+    DefaultTableModel modelo = new DefaultTableModel();
+    modelo.addColumn("Nome", new Class[]{String.class});
+    modelo.addColumn("CPF", new Class[]{String.class});
+    modelo.addColumn("RG", new Class[]{String.class});
+    modelo.addColumn("DataNascimento", new Class[]{String.class});
+    modelo.addColumn("LimiteDeCredito", new Class[]{String.class});
+    tabelaCliente = new JTable(modelo);
   }
+  return tabelaCliente;
+}
 
   // Implementação de DocumentFilter para permitir apenas números e limitar o
   // comprimento

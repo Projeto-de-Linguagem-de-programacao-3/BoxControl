@@ -20,7 +20,7 @@ public class TelaCliente extends JPanel {
 
   public UpperScreen getUpperScreen() {
     if(upperScreen == null) {
-      upperScreen = new UpperScreen("Clientes", "src/resources/bigIcons/usuarioBigIcon.png");
+      upperScreen = new UpperScreen("Clientes", "src/assets/bigIcons/usuarioBigIcon.png");
     }
     return upperScreen;
   }

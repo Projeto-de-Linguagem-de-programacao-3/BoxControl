@@ -20,7 +20,7 @@ public class TelaPedidos extends JPanel {
 
   public UpperScreen getUpperScreen() {
     if(upperScreen == null) {
-      upperScreen = new UpperScreen("Pedidos", "src/resources/bigIcons/pedidoBigIcon.png");
+      upperScreen = new UpperScreen("Pedidos", "src/assets/bigIcons/pedidoBigIcon.png");
     }
     return upperScreen;
   }

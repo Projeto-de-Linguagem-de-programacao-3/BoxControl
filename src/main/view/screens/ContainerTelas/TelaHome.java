@@ -22,7 +22,7 @@ public class TelaHome extends JPanel {
 
   public UpperScreen getUpperScreen() {
     if(upperScreen == null) {
-      upperScreen = new UpperScreen("Home", "src/resources/bigIcons/homeBigIcon.png");
+      upperScreen = new UpperScreen("Home", "src/assets/bigIcons/homeBigIcon.png");
     }
     return upperScreen;
   }

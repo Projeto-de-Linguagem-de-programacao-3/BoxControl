@@ -20,7 +20,7 @@ public class TelaVenda extends JPanel {
 
   public UpperScreen getUpperScreen() {
     if(upperScreen == null) {
-      upperScreen = new UpperScreen("Vendas", "src/resources/bigIcons/vendasBigIcon.png");
+      upperScreen = new UpperScreen("Vendas", "src/assets/bigIcons/vendasBigIcon.png");
     }
     return upperScreen;
   }

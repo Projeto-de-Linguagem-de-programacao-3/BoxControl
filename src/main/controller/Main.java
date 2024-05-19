@@ -1,6 +1,11 @@
 package main.controller;
 
 import java.awt.BorderLayout;
+import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import javax.swing.JPanel;
 
 import main.controller.actions.ButtonMenuListener;
@@ -12,6 +17,12 @@ import main.view.screens.Frame;
 
 public class Main {
   public static void main(String[] args) {
+    // Criando o arquivo txt caso não exista para verificação de balanço
+    criarArquivo("cliente.txt");
+    criarArquivo("Produtos.txt");
+    criarArquivo("Vendas.txt");
+    criarArquivo("pedido.txt");
+
     // Instancia das classes principais
     Frame frame = new Frame();
     JPanel layout = new JPanel();
@@ -40,4 +51,18 @@ public class Main {
     // Mesmo tendo colocado no construtor do frame, se não colocar aqui dá erro
     frame.setVisible(true);
   }
+
+  private static void criarArquivo(String nomeArquivo) {
+    String caminhoArquivo = nomeArquivo; // Substitua "caminho/para/" pelo seu caminho real
+
+    try {
+        Files.createFile(Paths.get(caminhoArquivo));
+        System.out.println("Arquivo " + nomeArquivo + " criado com sucesso!");
+    } catch (FileAlreadyExistsException e) {
+        System.out.println("O arquivo " + nomeArquivo + " já existe.");
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
+
 }

@@ -69,7 +69,7 @@ public class MenuLateral extends JPanel {
 
   public JButton getBotaoHome() {
     if(botaoHome == null) {
-      ImageIcon icon = new ImageIcon("src/resources/homeIcon.png");
+      ImageIcon icon = new ImageIcon("src/assets/homeIcon.png");
       botaoHome = new JButton("Home",icon);
       formataBotao(botaoHome);
     }
@@ -79,7 +79,7 @@ public class MenuLateral extends JPanel {
   // Getters dos botões
   public JButton getBotaoClientes() {
     if(botaoClientes == null) {
-      ImageIcon icon = new ImageIcon("src/resources/usuarioIcon.png");
+      ImageIcon icon = new ImageIcon("src/assets/usuarioIcon.png");
       botaoClientes = new JButton("Clientes",icon);
       formataBotao(botaoClientes);
     }
@@ -88,7 +88,7 @@ public class MenuLateral extends JPanel {
 
   public JButton getBotaoProdutos() {
     if(botaoProdutos == null) {
-      ImageIcon icon = new ImageIcon("src/resources/produtoIcon.png");
+      ImageIcon icon = new ImageIcon("src/assets/produtoIcon.png");
       botaoProdutos = new JButton("Produtos",icon);
       formataBotao(botaoProdutos);
     }
@@ -97,7 +97,7 @@ public class MenuLateral extends JPanel {
 
   public JButton getBotaoPedidos() {
     if(botaoPedidos == null) {
-      ImageIcon icon = new ImageIcon("src/resources/pedidoIcon.png");
+      ImageIcon icon = new ImageIcon("src/assets/pedidoIcon.png");
       botaoPedidos = new JButton("Pedidos",icon);
       formataBotao(botaoPedidos);
     }
@@ -106,7 +106,7 @@ public class MenuLateral extends JPanel {
 
   public JButton getBotaoVendas() {
     if(botaoVendas == null) {
-      ImageIcon icon = new ImageIcon("src/resources/vendasIcon.png");
+      ImageIcon icon = new ImageIcon("src/assets/vendasIcon.png");
       botaoVendas = new JButton("Vendas",icon);
       formataBotao(botaoVendas);
     }

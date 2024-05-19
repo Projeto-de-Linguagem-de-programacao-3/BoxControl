@@ -1,12 +1,14 @@
 package main.view.screens.TelasPrincipais;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
-import main.model.entity.DadosVendas;
+import main.controller.actions.ButtonVendasSalvarListener;
+import main.view.components.StyleGuide;
 
-import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -16,115 +18,179 @@ import java.util.List;
 import java.util.Map;
 
 public class VendasPrincipal extends JPanel {
-  private JTextField ProdutosQuantidade;
-  private JComboBox<String> clienteComboBox;
-  private JComboBox<String> formaPagamentoComboBox;
-  private JTextField ValorTotal;
+  private JTextField textProdutosQuantidade;
+  private JComboBox<String> comboBoxCliente;
+  private JComboBox<String> comboBoxFormaPagamento;
+  private JTextField textValorTotal;
+
+  private JLabel labelProdutosQuantidade;
+  private JLabel labelCliente;
+  private JLabel labelFormaPagamento;
+  private JLabel labelValorTotal;
+
+  JButton btnSalvar;
+
+  private JTable tabelaCliente;
 
   public VendasPrincipal() {
     super();
-    configurarComponentes();
+    setBackground(StyleGuide.bgScreen);
+    setLayout(new GridBagLayout());
+    GridBagConstraints constraints = new GridBagConstraints();
+    constraints.weightx=1;
+    constraints.weighty=1;
+    constraints.fill=GridBagConstraints.HORIZONTAL;
+    constraints.insets = new Insets(10,10,10,10);
+
+    constraints.gridx=0; 
+    constraints.gridy=0; 
+    add(getLabelCliente(),constraints);
+    constraints.gridx=0; 
+    constraints.gridy=1; 
+    add(getComboBoxCliente(), constraints);
+
+    constraints.gridx=0; 
+    constraints.gridy=2; 
+    add(getLabelProdutosQuantidade(), constraints);
+    constraints.gridx=0; 
+    constraints.gridy=3; 
+    add(getTextProdutosQuantidade(), constraints);
+
+    constraints.gridx=0; 
+    constraints.gridy=4; 
+    add(getLabelFormaPagamento(), constraints);
+    constraints.gridx=0; 
+    constraints.gridy=5; 
+    add(getComboBoxFormaPagamento(), constraints);
+
+    constraints.gridx=0; 
+    constraints.gridy=6; 
+    add(getLabelValorTotal(), constraints);
+    constraints.gridx=0; 
+    constraints.gridy=7; 
+    add(getTextValorTotal(), constraints);
+
+    constraints.gridx=0; 
+    constraints.gridy=8; 
+    constraints.gridwidth=2; // ocupa 2 colunas
+    add(getBtnSalvar(), constraints);
+    ButtonVendasSalvarListener buttonVendasSalvarListener = new ButtonVendasSalvarListener(this);
+    btnSalvar.addActionListener(buttonVendasSalvarListener);
+
+    constraints.gridx=2;
+    constraints.gridy=0;
+    constraints.gridwidth=2;
+    constraints.gridheight=5;
+    JScrollPane scrollPane = new JScrollPane(getTabelaCliente());
+    add(scrollPane, constraints);
   }
 
-  private void configurarComponentes() {
-    setLayout(null);
+  public JTextField getTextProdutosQuantidade() {
+    if (textProdutosQuantidade == null) {
+        textProdutosQuantidade = new JTextField();
+        StyleGuide.formataComponente(textProdutosQuantidade);
+    }
+    return textProdutosQuantidade;
+  }
 
-    JLabel lblCliente = new JLabel("Nome do Cliente:");
-    lblCliente.setFont(new Font("Tahoma", Font.PLAIN, 14));
-    lblCliente.setBounds(20, 11, 120, 20);
-    add(lblCliente);
-
-    clienteComboBox = new JComboBox<>(carregarClientes());
-    clienteComboBox.setBounds(20, 42, 200, 20);
-    add(clienteComboBox);
-
-    JLabel lblProdutosQuantidade = new JLabel("Produtos & Quantidade:");
-    lblProdutosQuantidade.setFont(new Font("Tahoma", Font.PLAIN, 14));
-    lblProdutosQuantidade.setBounds(20, 73, 150, 20);
-    add(lblProdutosQuantidade);
-
-    ProdutosQuantidade = new JTextField();
-    ProdutosQuantidade.setBounds(20, 104, 200, 20);
-    add(ProdutosQuantidade);
-
-    JLabel lblFormaPagamento = new JLabel("Forma de Pagamento:");
-    lblFormaPagamento.setFont(new Font("Tahoma", Font.PLAIN, 14));
-    lblFormaPagamento.setBounds(20, 135, 150, 20);
-    add(lblFormaPagamento);
-
-    String[] formasPagamento = { "À vista: 22% de desconto", "Cartão", "Fiado" };
-    formaPagamentoComboBox = new JComboBox<>(formasPagamento);
-    formaPagamentoComboBox.setBounds(20, 166, 200, 20);
-    add(formaPagamentoComboBox);
-
-    JLabel lblValorTotal = new JLabel("Valor Total:");
-    lblValorTotal.setFont(new Font("Tahoma", Font.PLAIN, 14));
-    lblValorTotal.setBounds(20, 197, 150, 20);
-    add(lblValorTotal);
-
-    ValorTotal = new JTextField();
-    ValorTotal.setBounds(20, 228, 200, 20);
-    add(ValorTotal);
-
-    JButton btnSalvar = new JButton("Salvar em Texto");
-    btnSalvar.setBounds(20, 259, 150, 20);
-    btnSalvar.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        salvarVenda();
+  public JComboBox<String> getComboBoxCliente() {
+      if (comboBoxCliente == null) {
+          comboBoxCliente = new JComboBox<>(carregarClientes());
+          StyleGuide.formataComponente(comboBoxCliente);
       }
-    });
-    add(btnSalvar);
+      return comboBoxCliente;
   }
 
-  private void salvarVenda() {
-
-    // Obter os dados inseridos pelo usuário
-    String cliente = (String) clienteComboBox.getSelectedItem();
-    String produtosQuantidadeTexto = ProdutosQuantidade.getText(); // Aqui você precisa converter o texto em um mapa de
-                                                                   // produtos e quantidades
-    String formaPagamento = (String) formaPagamentoComboBox.getSelectedItem();
-    String valorTotalTexto = ValorTotal.getText(); // Aqui você precisa converter o texto em um Double
-
-    // Aqui você precisa converter o texto em um mapa de produtos e quantidades
-    Map<String, Integer> produtosQuantidade = converterParaMapa(produtosQuantidadeTexto);
-
-    // Aqui você precisa converter o texto em um Double
-    Double valorTotal = Double.parseDouble(valorTotalTexto);
-
-    DadosVendas vendas = new DadosVendas();
-
-    vendas.setCliente(cliente);
-    vendas.setProdutosQuantidade(produtosQuantidade);
-    vendas.setFormaPagamento(formaPagamento);
-    vendas.setValorTotal(valorTotal);
-
-    String resultado = vendas.salvarTxt();
-    System.out.println(resultado);
-
-    // Aqui você pode salvar os dados da venda
-  }
-
-  private Map<String, Integer> converterParaMapa(String texto) {
-    Map<String, Integer> mapa = new HashMap<>();
-
-    // Divida o texto em pares de chave e valor
-    String[] pares = texto.split(",");
-
-    // Para cada par de chave e valor, divida novamente para obter o nome do produto
-    // e sua quantidade
-    for (String par : pares) {
-      String[] partes = par.trim().split(":");
-      if (partes.length == 2) {
-        String produto = partes[0].trim();
-        int quantidade = Integer.parseInt(partes[1].trim());
-        mapa.put(produto, quantidade);
+  public JComboBox<String> getComboBoxFormaPagamento() {
+      if (comboBoxFormaPagamento == null) {
+          String[] formasPagamento = { "À vista: 22% de desconto", "Cartão", "Fiado" };
+          comboBoxFormaPagamento = new JComboBox<>(formasPagamento);
+          StyleGuide.formataComponente(comboBoxFormaPagamento);
       }
+      return comboBoxFormaPagamento;
+  }
+
+  public JTextField getTextValorTotal() {
+      if (textValorTotal == null) {
+          textValorTotal = new JTextField();
+          StyleGuide.formataComponente(textValorTotal);
+      }
+      return textValorTotal;
+  }
+
+  public JLabel getLabelProdutosQuantidade() {
+      if (labelProdutosQuantidade == null) {
+          labelProdutosQuantidade = new JLabel("Produtos & Quantidade:");
+          StyleGuide.formataComponente(labelProdutosQuantidade);
+      }
+      return labelProdutosQuantidade;
+  }
+
+  public JLabel getLabelCliente() {
+      if (labelCliente == null) {
+          labelCliente = new JLabel("Cliente:");
+          StyleGuide.formataComponente(labelCliente);
+      }
+      return labelCliente;
+  }
+
+  public JLabel getLabelFormaPagamento() {
+      if (labelFormaPagamento == null) {
+          labelFormaPagamento = new JLabel("Forma de Pagamento:");
+          StyleGuide.formataComponente(labelFormaPagamento);
+      }
+      return labelFormaPagamento;
+  }
+
+  public JLabel getLabelValorTotal() {
+      if (labelValorTotal == null) {
+          labelValorTotal = new JLabel("Valor Total:");
+          StyleGuide.formataComponente(labelValorTotal);
+      }
+      return labelValorTotal;
+  }
+
+  public JButton getBtnSalvar() {
+  if(btnSalvar == null) {
+    btnSalvar = new JButton("Salvar cliente");
+    StyleGuide.formataComponente(btnSalvar);
+  }
+  return btnSalvar;
+}
+
+public JTable getTabelaCliente() {
+  if(tabelaCliente == null) {
+    DefaultTableModel modelo = new DefaultTableModel();
+    modelo.addColumn("Cliente", new Class[]{String.class});
+    modelo.addColumn("Produtos e Quantidade", new Class[]{String.class});
+    modelo.addColumn("Forma de Pagamento", new Class[]{String.class});
+    modelo.addColumn("Valor Total", new Class[]{String.class});
+    tabelaCliente = new JTable(modelo);
+  }
+  return tabelaCliente;
+}
+
+    public Map<String, Integer> converterParaMapa(String texto) {
+      Map<String, Integer> mapa = new HashMap<>();
+
+      // Divida o texto em pares de chave e valor
+      String[] pares = texto.split(",");
+
+      // Para cada par de chave e valor, divida novamente para obter o nome do produto
+      // e sua quantidade
+      for (String par : pares) {
+        String[] partes = par.trim().split(":");
+        if (partes.length == 2) {
+          String produto = partes[0].trim();
+          int quantidade = Integer.parseInt(partes[1].trim());
+          mapa.put(produto, quantidade);
+        }
+      }
+
+      return mapa;
     }
 
-    return mapa;
-  }
-
-  private String[] carregarClientes() {
+    private String[] carregarClientes() {
     List<String> clientes = new ArrayList<>();
     try (BufferedReader br = new BufferedReader(new FileReader("cliente.txt"))) {
       String line;

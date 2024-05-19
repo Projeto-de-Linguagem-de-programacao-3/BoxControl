@@ -1,133 +1,247 @@
 package main.view.screens.TelasPrincipais;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.text.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import main.model.entity.DadosProduto;
+import main.controller.actions.ButtonProdutoSalvarListener;
 import main.view.components.StyleGuide;
-import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 
 public class ProdutoPrincipal extends JPanel {
-  private JTextField txtNome;
-  private JTextField txtTipo;
-  private JTextField txtPrecoCompra;
-  private JTextField txtPrecoVenda;
-  private JTextField txtFabricante;
-  private JTextField txtValidade;
-  private JTextField txtQuantidadeEstoque;
+  private JTextField textNome;
+  private JTextField textTipo;
+  private JTextField textPrecoCompra;
+  private JTextField textPrecoVenda;
+  private JTextField textFabricante;
+  private JTextField textValidade;
+  private JTextField textQuantidadeEstoque;
+
+  private JLabel labelNome;
+  private JLabel labelTipo;
+  private JLabel labelPrecoCompra;
+  private JLabel labelPrecoVenda;
+  private JLabel labelFabricante;
+  private JLabel labelValidade;
+  private JLabel labelQuantidadeEstoque;
+
+  private JButton btnSalvar;
+
+  private JTable tabelaProduto;
 
   public ProdutoPrincipal() {
     super();
     setBackground(StyleGuide.bgScreen);
-    configurarComponentes();
+    setLayout(new GridBagLayout());
+    GridBagConstraints constraints = new GridBagConstraints();
+    constraints.weightx=1;
+    constraints.weighty=1;
+    constraints.fill=GridBagConstraints.HORIZONTAL;
+    constraints.insets = new Insets(10,10,10,10);
+
+    constraints.gridx=0; 
+    constraints.gridy=0; 
+    add(getLabelNome(),constraints);
+    constraints.gridx=0; 
+    constraints.gridy=1; 
+    add(getTextNome(), constraints);
+
+    constraints.gridx=0; 
+    constraints.gridy=2; 
+    add(getLabelTipo(), constraints);
+    constraints.gridx=0; 
+    constraints.gridy=3; 
+    add(getTextTipo(), constraints);
+
+    constraints.gridx=0; 
+    constraints.gridy=4; 
+    add(getLabelPrecoCompra(), constraints);
+    constraints.gridx=0; 
+    constraints.gridy=5; 
+    add(getTextPrecoCompra(), constraints);
+
+    constraints.gridx=0; 
+    constraints.gridy=6; 
+    add(getLabelPrecoVenda(), constraints);
+    constraints.gridx=0; 
+    constraints.gridy=7; 
+    add(getTextPrecoVenda(), constraints);
+
+    constraints.gridx=0; 
+    constraints.gridy=8; 
+    add(getLabelFabricante(), constraints);
+    constraints.gridx=0;
+    constraints.gridy=9;
+    add(getTextFabricante(), constraints);
+
+    constraints.gridx=0; 
+    constraints.gridy=10; 
+    add(getLabelValidade(), constraints);
+    constraints.gridx=0;
+    constraints.gridy=11;
+    add(getTextValidade(), constraints);
+
+    constraints.gridx=0; 
+    constraints.gridy=12; 
+    add(getLabelQuantidadeEstoque(), constraints);
+    constraints.gridx=0;
+    constraints.gridy=13;
+    add(getTextQuantidadeEstoque(), constraints);
+
+    constraints.gridx=0; 
+    constraints.gridy=14; 
+    constraints.gridwidth=2; // ocupa 2 colunas
+    add(getBtnSalvar(), constraints);
+    ButtonProdutoSalvarListener buttonProdutoSalvarListener = new ButtonProdutoSalvarListener(this);
+    btnSalvar.addActionListener(buttonProdutoSalvarListener);
+
+    constraints.gridx=2;
+    constraints.gridy=0;
+    constraints.gridwidth=2;
+    constraints.gridheight=5;
+    JScrollPane scrollPane = new JScrollPane(getTabelaCliente());
+    add(scrollPane, constraints);
   }
 
-  private void configurarComponentes() {
-    setLayout(null);
+  public JTextField getTextNome() {
+    if (textNome == null) {
+        textNome = new JTextField();
+        StyleGuide.formataComponente(textNome);
+    }
+    return textNome;
+}
 
-    JLabel lblNome = new JLabel("Nome:");
-    lblNome.setFont(new Font("Tahoma", Font.PLAIN, 14));
-    lblNome.setBounds(20, 3, 120, 20);
-    add(lblNome);
+public JTextField getTextTipo() {
+    if (textTipo == null) {
+        textTipo = new JTextField();
+        StyleGuide.formataComponente(textTipo);
+    }
+    return textTipo;
+}
 
-    txtNome = new JTextField();
-    txtNome.setBounds(20, 26, 200, 20);
-    add(txtNome);
+public JTextField getTextPrecoCompra() {
+    if (textPrecoCompra == null) {
+        textPrecoCompra = new JTextField();
+        ((AbstractDocument) textPrecoCompra.getDocument()).setDocumentFilter(new NumericFilter());
+        StyleGuide.formataComponente(textPrecoCompra);
+    }
+    return textPrecoCompra;
+}
 
-    JLabel lblTipo = new JLabel("Tipo:");
-    lblTipo.setFont(new Font("Tahoma", Font.PLAIN, 14));
-    lblTipo.setBounds(20, 49, 120, 20);
-    add(lblTipo);
+public JTextField getTextPrecoVenda() {
+    if (textPrecoVenda == null) {
+        textPrecoVenda = new JTextField();
+        ((AbstractDocument) textPrecoVenda.getDocument()).setDocumentFilter(new NumericFilter());
+        StyleGuide.formataComponente(textPrecoVenda);
+    }
+    return textPrecoVenda;
+}
 
-    txtTipo = new JTextField();
-    txtTipo.setBounds(20, 72, 200, 20);
-    add(txtTipo);
+public JTextField getTextFabricante() {
+    if (textFabricante == null) {
+        textFabricante = new JTextField();
+        StyleGuide.formataComponente(textFabricante);
+    }
+    return textFabricante;
+}
 
-    JLabel lblPrecoCompra = new JLabel("Preço de Compra:");
-    lblPrecoCompra.setFont(new Font("Tahoma", Font.PLAIN, 14));
-    lblPrecoCompra.setBounds(20, 95, 120, 20);
-    add(lblPrecoCompra);
+public JTextField getTextValidade() {
+    if (textValidade == null) {
+        textValidade = new JTextField();
+        ((AbstractDocument) textValidade.getDocument()).setDocumentFilter(new NumericFilter());
+        StyleGuide.formataComponente(textValidade);
+    }
+    return textValidade;
+}
 
-    txtPrecoCompra = new JTextField();
-    txtPrecoCompra.setBounds(20, 118, 200, 20);
-    add(txtPrecoCompra);
+public JTextField getTextQuantidadeEstoque() {
+    if (textQuantidadeEstoque == null) {
+        textQuantidadeEstoque = new JTextField();
+        ((AbstractDocument) textQuantidadeEstoque.getDocument()).setDocumentFilter(new NumericFilter());
+        StyleGuide.formataComponente(textQuantidadeEstoque);
+    }
+    return textQuantidadeEstoque;
+}
 
-    ((AbstractDocument) txtPrecoCompra.getDocument()).setDocumentFilter(new NumericFilter());
+public JLabel getLabelNome() {
+    if (labelNome == null) {
+        labelNome = new JLabel("Nome:");
+        StyleGuide.formataComponente(labelNome);
+    }
+    return labelNome;
+}
 
-    JLabel lblPrecoVenda = new JLabel("Preço de Venda:");
-    lblPrecoVenda.setFont(new Font("Tahoma", Font.PLAIN, 14));
-    lblPrecoVenda.setBounds(20, 141, 120, 20);
-    add(lblPrecoVenda);
+public JLabel getLabelTipo() {
+    if (labelTipo == null) {
+        labelTipo = new JLabel("Tipo:");
+        StyleGuide.formataComponente(labelTipo);
+    }
+    return labelTipo;
+}
 
-    txtPrecoVenda = new JTextField();
-    txtPrecoVenda.setBounds(20, 164, 200, 20);
-    add(txtPrecoVenda);
-    ((AbstractDocument) txtPrecoVenda.getDocument()).setDocumentFilter(new NumericFilter());
+public JLabel getLabelPrecoCompra() {
+    if (labelPrecoCompra == null) {
+        labelPrecoCompra = new JLabel("Preço de Compra:");
+        StyleGuide.formataComponente(labelPrecoCompra);
+    }
+    return labelPrecoCompra;
+}
 
-    JLabel lblFabricante = new JLabel("Fabricante:");
-    lblFabricante.setFont(new Font("Tahoma", Font.PLAIN, 14));
-    lblFabricante.setBounds(20, 187, 120, 20);
-    add(lblFabricante);
+public JLabel getLabelPrecoVenda() {
+    if (labelPrecoVenda == null) {
+        labelPrecoVenda = new JLabel("Preço de Venda:");
+        StyleGuide.formataComponente(labelPrecoVenda);
+    }
+    return labelPrecoVenda;
+}
 
-    txtFabricante = new JTextField();
-    txtFabricante.setBounds(20, 210, 200, 20);
-    add(txtFabricante);
+public JLabel getLabelFabricante() {
+    if (labelFabricante == null) {
+        labelFabricante = new JLabel("Fabricante:");
+        StyleGuide.formataComponente(labelFabricante);
+    }
+    return labelFabricante;
+}
 
-    JLabel lblValidade = new JLabel("Validade:");
-    lblValidade.setFont(new Font("Tahoma", Font.PLAIN, 14));
-    lblValidade.setBounds(20, 233, 120, 20);
-    add(lblValidade);
+public JLabel getLabelValidade() {
+    if (labelValidade == null) {
+        labelValidade = new JLabel("Validade:");
+        StyleGuide.formataComponente(labelValidade);
+    }
+    return labelValidade;
+}
 
-    txtValidade = new JTextField();
-    txtValidade.setBounds(20, 256, 200, 20);
-    add(txtValidade);
-    ((AbstractDocument) txtValidade.getDocument()).setDocumentFilter(new NumericFilter());
+public JLabel getLabelQuantidadeEstoque() {
+    if (labelQuantidadeEstoque == null) {
+        labelQuantidadeEstoque = new JLabel("Quantidade em Estoque:");
+        StyleGuide.formataComponente(labelQuantidadeEstoque);
+    }
+    return labelQuantidadeEstoque;
+}
 
-    JLabel lblQuantidadeEstoque = new JLabel("Quantidade em Estoque:");
-    lblQuantidadeEstoque.setFont(new Font("Tahoma", Font.PLAIN, 14));
-    lblQuantidadeEstoque.setBounds(20, 279, 183, 20);
-    add(lblQuantidadeEstoque);
-
-    txtQuantidadeEstoque = new JTextField();
-    txtQuantidadeEstoque.setBounds(20, 302, 170, 20);
-    add(txtQuantidadeEstoque);
-    ((AbstractDocument) txtQuantidadeEstoque.getDocument()).setDocumentFilter(new NumericFilter());
-
-    JButton btnSalvar = new JButton("Salvar em Texto");
-    btnSalvar.setBounds(20, 325, 150, 20);
-    btnSalvar.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        salvarProduto();
-      }
-    });
-    add(btnSalvar);
+public JButton getBtnSalvar() {
+  if(btnSalvar == null) {
+    btnSalvar = new JButton("Salvar cliente");
+    StyleGuide.formataComponente(btnSalvar);
   }
+  return btnSalvar;
+}
 
-  private void salvarProduto() {
-    // Obter os dados inseridos pelo usuário
-    String nome = txtNome.getText();
-    String tipo = txtTipo.getText();
-    double precoCompra = Double.parseDouble(txtPrecoCompra.getText());
-    double precoVenda = Double.parseDouble(txtPrecoVenda.getText());
-    String fabricante = txtFabricante.getText();
-    String validade = txtValidade.getText();
-    int quantidadeEstoque = Integer.parseInt(txtQuantidadeEstoque.getText());
-
-    DadosProduto produto = new DadosProduto();
-
-    produto.setNome(nome);
-    produto.setNome(tipo);
-    produto.setPrecoCompra(precoCompra);
-    produto.setPrecoVenda(precoVenda);
-    produto.setFabricante(fabricante);
-    produto.setValidade(validade);
-    produto.setQuantidadeEstoque(quantidadeEstoque);
-
-    String resultado = produto.salvarTxt();
-    System.out.println(resultado);
+public JTable getTabelaCliente() {
+  if(tabelaProduto == null) {
+    DefaultTableModel modelo = new DefaultTableModel();
+    modelo.addColumn("Nome", new Class[]{String.class});
+    modelo.addColumn("Tipo", new Class[]{String.class});
+    modelo.addColumn("Preço Compra", new Class[]{String.class});
+    modelo.addColumn("Preço Venda", new Class[]{String.class});
+    modelo.addColumn("Fabricante", new Class[]{String.class});
+    modelo.addColumn("Validade", new Class[]{String.class});
+    modelo.addColumn("Quantidade Estoque", new Class[]{String.class});
+    tabelaProduto = new JTable(modelo);
   }
+  return tabelaProduto;
+}
 
   // Implementação de DocumentFilter para permitir apenas números
   class NumericFilter extends DocumentFilter {

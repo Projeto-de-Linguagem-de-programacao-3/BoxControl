@@ -20,7 +20,7 @@ public class TelaProduto extends JPanel {
 
   public UpperScreen getUpperScreen() {
     if(upperScreen == null) {
-      upperScreen = new UpperScreen("Produtos", "src/resources/bigIcons/produtoBigIcon.png");
+      upperScreen = new UpperScreen("Produtos", "src/assets/bigIcons/produtoBigIcon.png");
     }
     return upperScreen;
   }

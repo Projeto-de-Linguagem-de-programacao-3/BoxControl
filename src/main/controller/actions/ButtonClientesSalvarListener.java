@@ -24,29 +24,37 @@ public class ButtonClientesSalvarListener implements ActionListener {
     String dataNascimento = clientePrincipal.getTextNascimento().getText();
     String limiteCreditoText = clientePrincipal.getTextCredito().getText(); // Obter o texto do limite de crédito
 
-    // Verificar se o CPF tem exatamente 8 caracteres
-    // também tem que colocar os para valores menor
-    if (cpf.length() != 11) {
+    // Verificar se o CPF tem exatamente 11 caracteres
+    if (cpf.length() == 11) {
       JOptionPane.showMessageDialog(clientePrincipal, "O CPF deve ter exatamente 11 números.", "Erro de validação",
           JOptionPane.ERROR_MESSAGE);
       return;
     }
 
     // Verificar se o RG tem exatamente 9 caracteres
-    // também tem que colocar os para valores menor
-    if (rg.length() != 10) {
+    if (rg.length() == 10) {
       JOptionPane.showMessageDialog(clientePrincipal, "O RG deve ter exatamente 10 números.", "Erro de validação",
           JOptionPane.ERROR_MESSAGE);
       return;
     }
-    // Verificar se o limite de crédito ultrapassa 100.000,00
-    if (!limiteCreditoText.isEmpty() && Double.parseDouble(limiteCreditoText) > 100000) {
-      JOptionPane.showMessageDialog(clientePrincipal, "O limite de crédito deve ser até 100.000,00.", "Erro de validação",
+
+    // Verificar se o limite de crédito é válido
+    double limiteCredito = 0;
+    try {
+      if (!limiteCreditoText.isEmpty()) {
+        limiteCredito = Double.parseDouble(limiteCreditoText);
+        if (limiteCredito <= 0) {
+          JOptionPane.showMessageDialog(clientePrincipal, "O limite de crédito deve ser até 0.",
+              "Erro de validação", JOptionPane.ERROR_MESSAGE);
+          return;
+        }
+      }
+    } catch (NumberFormatException ex) {
+      JOptionPane.showMessageDialog(clientePrincipal,
+          "Por favor, insira um valor numérico válido para o limite de crédito.", "Erro de validação",
           JOptionPane.ERROR_MESSAGE);
       return;
     }
-    // Converter o limite de crédito para double
-    double limiteCredito = Double.parseDouble(limiteCreditoText);
 
     // Criar um objeto DadosCliente e definir os dados do cliente
     DadosCliente cliente = new DadosCliente();
@@ -58,7 +66,7 @@ public class ButtonClientesSalvarListener implements ActionListener {
 
     // Chamar o método salvarTxt() para salvar os dados do cliente
     String resultado = cliente.salvarTxt();
-    JOptionPane.showMessageDialog(clientePrincipal, resultado, "Resultado:", JOptionPane.INFORMATION_MESSAGE); 
+    JOptionPane.showMessageDialog(clientePrincipal, resultado, "Resultado:", JOptionPane.INFORMATION_MESSAGE);
   }
   
 }

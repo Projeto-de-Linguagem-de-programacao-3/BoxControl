@@ -1,6 +1,8 @@
 package main.model.entity;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class DadosCliente {
@@ -75,7 +77,7 @@ public class DadosCliente {
                 return "ID já existe. Detalhes do cliente não foram registrados.";
             }
 
-            FileWriter fWriter = new FileWriter("Cliente.txt", true);
+            FileWriter fWriter = new FileWriter("cliente.txt", true);
             PrintWriter pWriter = new PrintWriter(fWriter);
 
             pWriter.println("\nCliente:");
@@ -100,7 +102,7 @@ public class DadosCliente {
     // Método para verificar se o ID já existe no arquivo Cliente.txt
     private boolean idJaExiste() {
         try {
-            File file = new File("Cliente.txt");
+            File file = new File("cliente.txt");
             Scanner scanner = new Scanner(file);
 
             while (scanner.hasNextLine()) {
@@ -126,9 +128,9 @@ public class DadosCliente {
             Scanner scanner = new Scanner(file);
 
             while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-                if (line.startsWith("ID: ")) {
-                    int id = Integer.parseInt(line.substring(4));
+                String linha = scanner.nextLine();
+                if (linha.startsWith("ID: ")) {
+                    int id = Integer.parseInt(linha.substring(4));
                     if (id > ultimo) {
                         ultimo = id;
                     }

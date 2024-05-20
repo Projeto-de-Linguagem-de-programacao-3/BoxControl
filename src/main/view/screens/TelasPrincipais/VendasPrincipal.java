@@ -158,6 +158,7 @@ public class VendasPrincipal extends JPanel {
     return btnSalvar;
   }
 
+ 
   public JTable getTabelaCliente() {
     if (tabelaCliente == null) {
       DefaultTableModel modelo = new DefaultTableModel();

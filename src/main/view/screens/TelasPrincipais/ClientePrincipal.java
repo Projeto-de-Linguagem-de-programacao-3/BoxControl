@@ -218,10 +218,12 @@ public class ClientePrincipal extends JPanel {
     if (tabelaCliente == null) {
       DefaultTableModel modelo = new DefaultTableModel();
       modelo.addColumn("Nome", new Class[] { String.class });
-      modelo.addColumn("CPF", new Class[] { String.class });
-      modelo.addColumn("RG", new Class[] { String.class });
-      modelo.addColumn("DataNascimento", new Class[] { String.class });
-      modelo.addColumn("LimiteDeCredito", new Class[] { String.class });
+      /*
+       * modelo.addColumn("CPF", new Class[] { String.class });
+       * modelo.addColumn("RG", new Class[] { String.class });
+       * modelo.addColumn("DataNascimento", new Class[] { String.class });
+       * modelo.addColumn("LimiteDeCredito", new Class[] { String.class });
+       */
       tabelaCliente = new JTable(modelo);
     }
     return tabelaCliente;
@@ -236,7 +238,8 @@ public class ClientePrincipal extends JPanel {
       while (scanner.hasNextLine()) {
         String linha = scanner.nextLine();
         if (linha.startsWith("Nome: ")) {
-          String nome = linha.substring(6).trim(); // Extrai o nome após "Nome: " e remove espaços em branco
+          String nome = linha.substring(6).trim(); // Extrai o nome após "Nome: " e
+
           System.out.println(nome);
         }
       }
@@ -245,6 +248,21 @@ public class ClientePrincipal extends JPanel {
       e.printStackTrace();
     }
 
+    try {
+      File file = new File("cliente.txt");
+      Scanner scanner = new Scanner(file);
+
+      while (scanner.hasNextLine()) {
+        String line = scanner.nextLine();
+        if (!line.isEmpty()) {
+          System.out.println(line);
+        }
+      }
+
+      scanner.close();
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
   }
 
 }

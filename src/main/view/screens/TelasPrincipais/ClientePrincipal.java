@@ -7,6 +7,7 @@ import main.view.components.StyleGuide;
 import main.controller.actions.ButtonClientesSalvarListener;
 import main.model.entity.DadosCliente;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -17,6 +18,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -90,12 +92,10 @@ public class ClientePrincipal extends JPanel {
     constraints.gridx = 2;
     constraints.gridy = 0;
     constraints.gridwidth = 2;
-    constraints.gridheight = 5;
+    constraints.gridheight = 10;
     JScrollPane scrollPane = new JScrollPane(getTabelaCliente());
+    scrollPane.setMinimumSize(new Dimension(100,300));
     add(scrollPane, constraints);
-
-    preencheClienteName(textNome);
-
   }
 
   public JLabel getLabelNome() {
@@ -216,22 +216,17 @@ public class ClientePrincipal extends JPanel {
 
   public JTable getTabelaCliente() {
     if (tabelaCliente == null) {
-      DefaultTableModel modelo = new DefaultTableModel();
-      modelo.addColumn("Nome", new Class[] { String.class });
-      /*
-       * modelo.addColumn("CPF", new Class[] { String.class });
-       * modelo.addColumn("RG", new Class[] { String.class });
-       * modelo.addColumn("DataNascimento", new Class[] { String.class });
-       * modelo.addColumn("LimiteDeCredito", new Class[] { String.class });
-       */
+      String[] titulos = {"ID", "Nome", "CPF", "RG", "Data de Nascimento", "Limite de Crédito"};
+      DefaultTableModel modelo = new DefaultTableModel(titulos, 0);
       tabelaCliente = new JTable(modelo);
+      preencheClienteName(modelo);
     }
     return tabelaCliente;
   }
 
-  private void preencheClienteName(JTextField textFieldNome) {
+  private void preencheClienteName(DefaultTableModel modelo) {
 
-    try {
+    /**try {
       File file = new File("cliente.txt");
       Scanner scanner = new Scanner(file);
 
@@ -246,16 +241,27 @@ public class ClientePrincipal extends JPanel {
       scanner.close();
     } catch (FileNotFoundException e) {
       e.printStackTrace();
-    }
+    } **/
 
     try {
       File file = new File("cliente.txt");
       Scanner scanner = new Scanner(file);
-
+      Object[] dadosLinha = new Object[6];
+      int i = 0;
       while (scanner.hasNextLine()) {
         String line = scanner.nextLine();
         if (!line.isEmpty()) {
-          System.out.println(line);
+          if(line.startsWith("Cliente")) {
+            continue;
+          }
+          String[] dados = line.split(":");
+          dadosLinha[i] = dados[1];
+          i++;
+          System.out.println(dadosLinha);
+          if(line.startsWith("Limite de Crédito")) {
+              modelo.addRow(dadosLinha);
+              i = 0;
+          }
         }
       }
 
@@ -265,4 +271,9 @@ public class ClientePrincipal extends JPanel {
     }
   }
 
+  public void atualizarTabela() {
+    DefaultTableModel modelo = (DefaultTableModel) getTabelaCliente().getModel();
+    modelo.setRowCount(0);
+    preencheClienteName(modelo);
+  }
 }

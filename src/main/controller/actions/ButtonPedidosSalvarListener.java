@@ -17,7 +17,7 @@ public class ButtonPedidosSalvarListener implements ActionListener {
 
   @Override
   public void actionPerformed(ActionEvent e) {
-    String produto = pedidosPrincipal.getTextProduto().getText();
+    String produto = (String) pedidosPrincipal.getTextProduto().getSelectedItem();
     double precoCompra = Double.parseDouble(pedidosPrincipal.getTextPrecoCompra().getText());
     String fabricante = pedidosPrincipal.getTextFabricante().getText();
     String validade = pedidosPrincipal.getTextValidade().getText();
@@ -34,6 +34,8 @@ public class ButtonPedidosSalvarListener implements ActionListener {
     
     String resultado = pedido.salvarTxt();
     JOptionPane.showMessageDialog(pedidosPrincipal, resultado, "Resultado:", JOptionPane.INFORMATION_MESSAGE);
+    pedidosPrincipal.atualizarTabela();
+    
   }
   
 }

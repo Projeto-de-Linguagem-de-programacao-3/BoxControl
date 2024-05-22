@@ -5,10 +5,16 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.text.*;
 import main.controller.actions.ButtonProdutoSalvarListener;
 import main.view.components.StyleGuide;
+
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.Scanner;
 
 public class ProdutoPrincipal extends JPanel {
     private JTextField textNome;
@@ -100,8 +106,9 @@ public class ProdutoPrincipal extends JPanel {
         constraints.gridx = 2;
         constraints.gridy = 0;
         constraints.gridwidth = 2;
-        constraints.gridheight = 5;
+        constraints.gridheight = 14;
         JScrollPane scrollPane = new JScrollPane(getTabelaCliente());
+        scrollPane.setMinimumSize(new Dimension(100,500));
         add(scrollPane, constraints);
     }
 
@@ -187,7 +194,13 @@ public class ProdutoPrincipal extends JPanel {
 
     public JTextField getTextPrecoCompra() {
         if (textPrecoCompra == null) {
-            textPrecoCompra = new JTextField();
+            NumberFormat numberFormat = NumberFormat.getNumberInstance();
+            numberFormat.setGroupingUsed(false);
+            NumberFormatter numberFormatter = new NumberFormatter(numberFormat);
+            numberFormatter.setValueClass(Double.class);
+            numberFormatter.setAllowsInvalid(false); // Não permite caracteres não numéricos
+            numberFormatter.setMinimum(0.0); // Define um valor mínimo
+            textPrecoCompra = new JFormattedTextField(numberFormatter);
             StyleGuide.formataComponente(textPrecoCompra);
         }
         return textPrecoCompra;
@@ -195,7 +208,13 @@ public class ProdutoPrincipal extends JPanel {
 
     public JTextField getTextPrecoVenda() {
         if (textPrecoVenda == null) {
-            textPrecoVenda = new JTextField();
+            NumberFormat numberFormat = NumberFormat.getNumberInstance();
+            numberFormat.setGroupingUsed(false);
+            NumberFormatter numberFormatter = new NumberFormatter(numberFormat);
+            numberFormatter.setValueClass(Double.class);
+            numberFormatter.setAllowsInvalid(false); // Não permite caracteres não numéricos
+            numberFormatter.setMinimum(0.0); // Define um valor mínimo
+            textPrecoVenda = new JFormattedTextField(numberFormatter);
             StyleGuide.formataComponente(textPrecoVenda);
         }
         return textPrecoVenda;
@@ -226,13 +245,14 @@ public class ProdutoPrincipal extends JPanel {
 
     public JTextField getTextQuantidadeEstoque() {
         if (textQuantidadeEstoque == null) {
-            textQuantidadeEstoque = new JTextField();
-          /*   try {
-                MaskFormatter mascaraQuantidade = new MaskFormatter("#############");
-                textQuantidadeEstoque = new JFormattedTextField(mascaraQuantidade);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            } */
+            NumberFormat numberFormat = NumberFormat.getNumberInstance();
+            numberFormat.setGroupingUsed(false);
+            NumberFormatter numberFormatter = new NumberFormatter(numberFormat);
+            numberFormatter.setValueClass(Double.class);
+            numberFormatter.setAllowsInvalid(false); // Não permite caracteres não numéricos
+            numberFormatter.setMinimum(0.0); // Define um valor mínimo
+
+            textQuantidadeEstoque = new JFormattedTextField(numberFormatter);
             StyleGuide.formataComponente(textQuantidadeEstoque);
         }
         return textQuantidadeEstoque;
@@ -240,17 +260,46 @@ public class ProdutoPrincipal extends JPanel {
 
     public JTable getTabelaCliente() {
         if (tabelaProduto == null) {
-            DefaultTableModel modelo = new DefaultTableModel();
-            modelo.addColumn("Nome", new Class[] { String.class });
-            modelo.addColumn("Tipo", new Class[] { String.class });
-            modelo.addColumn("Preço Compra", new Class[] { String.class });
-            modelo.addColumn("Preço Venda", new Class[] { String.class });
-            modelo.addColumn("Fabricante", new Class[] { String.class });
-            modelo.addColumn("Validade", new Class[] { String.class });
-            modelo.addColumn("Quantidade Estoque", new Class[] { String.class });
+            String[] titulos = {"ID", "Nome", "Tipo", "Preço Compra", "Preço Venda", "Fabricante", "Validade", "Quantidade Estoque"};
+            DefaultTableModel modelo = new DefaultTableModel(titulos, 0);
             tabelaProduto = new JTable(modelo);
+            preencheProdutoTable(modelo);
         }
         return tabelaProduto;
     }
 
+    private void preencheProdutoTable(DefaultTableModel modelo) {
+        try {
+      File file = new File("Produtos.txt");
+      Scanner scanner = new Scanner(file);
+      Object[] dadosLinha = new Object[8];
+      int i = 0;
+      while (scanner.hasNextLine()) {
+        String line = scanner.nextLine();
+        if (!line.isEmpty()) {
+          if(line.startsWith("Produto")) {
+            continue;
+          }
+          String[] dados = line.split(":");
+          dadosLinha[i] = dados[1];
+          i++;
+          System.out.println(dadosLinha);
+          if(line.startsWith("Quantidade em Estoque")) {
+              modelo.addRow(dadosLinha);
+              i = 0;
+          }
+        }
+      }
+
+      scanner.close();
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+    }
+
+    public void atualizarTabela() {
+        DefaultTableModel modelo = (DefaultTableModel) getTabelaCliente().getModel();
+        modelo.setRowCount(0);
+        preencheProdutoTable(modelo);
+    }
 }

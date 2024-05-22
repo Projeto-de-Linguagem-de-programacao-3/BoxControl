@@ -40,5 +40,6 @@ public class ButtonVendasSalvarListener implements ActionListener {
 
     String resultado = vendas.salvarTxt();
     JOptionPane.showMessageDialog(vendasPrincipal, resultado, "Resultado:", JOptionPane.INFORMATION_MESSAGE);
+    vendasPrincipal.atualizarTabela();
   }
 }

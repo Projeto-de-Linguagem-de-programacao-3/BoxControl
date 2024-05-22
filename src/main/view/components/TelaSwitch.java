@@ -68,6 +68,7 @@ public class TelaSwitch extends JPanel {
   public TelaVenda getTelaVendas() {
     if(telaVendas == null) {
       telaVendas = new TelaVenda();
+      
     }
     return telaVendas;
   }

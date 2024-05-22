@@ -7,13 +7,23 @@ import javax.swing.text.*;
 import main.controller.actions.ButtonPedidosSalvarListener;
 import main.view.components.StyleGuide;
 
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 public class PedidosPrincipal extends JPanel {
-    private JTextField textProduto;
+    private JComboBox<String> textProduto;
     private JTextField textPrecoCompra;
     private JTextField textFabricante;
     private JTextField textValidade;
@@ -84,8 +94,9 @@ public class PedidosPrincipal extends JPanel {
         constraints.gridx = 2;
         constraints.gridy = 0;
         constraints.gridwidth = 2;
-        constraints.gridheight = 5;
+        constraints.gridheight = 10;
         JScrollPane scrollPane = new JScrollPane(getTabelaCliente());
+        scrollPane.setMinimumSize(new Dimension(100, 500));
         add(scrollPane, constraints);
     }
 
@@ -97,10 +108,10 @@ public class PedidosPrincipal extends JPanel {
         return labelProduto;
     }
 
-    public JTextField getTextProduto() {
+    public JComboBox<String> getTextProduto() {
         if (textProduto == null) {
-            textProduto = new JTextField();
-            StyleGuide.formataComponente(textProduto);
+            textProduto = new JComboBox<>(carregarProdutos());
+            textProduto.setFont(new Font("Tahoma", Font.PLAIN, 14));
         }
         return textProduto;
     }// Getters for JLabel elements
@@ -187,15 +198,71 @@ public class PedidosPrincipal extends JPanel {
 
     public JTable getTabelaCliente() {
         if (tabelaCliente == null) {
-            DefaultTableModel modelo = new DefaultTableModel();
-            modelo.addColumn("Produto", new Class[] { String.class });
-            modelo.addColumn("Preço de compra", new Class[] { String.class });
-            modelo.addColumn("Fabricante", new Class[] { String.class });
-            modelo.addColumn("Validade", new Class[] { String.class });
-            modelo.addColumn("Quantidade", new Class[] { String.class });
+            String[] titulos = {"Produto", "Preço de compra", "Fabricante", "Validade", "Quantidade"};
+            DefaultTableModel modelo = new DefaultTableModel(titulos, 0);
             tabelaCliente = new JTable(modelo);
+            preenchePedidosTabela(modelo);
         }
         return tabelaCliente;
     }
+
+    private void preenchePedidosTabela(DefaultTableModel modelo) {
+
+    try {
+      File file = new File("pedido.txt");
+      Scanner scanner = new Scanner(file);
+      Object[] dadosLinha = new Object[5];
+      int i = 0;
+      while (scanner.hasNextLine()) {
+        String line = scanner.nextLine();
+        if (!line.isEmpty()) {
+          if(line.startsWith("Pedido de Produto")) {
+            continue;
+          }
+          String[] dados = line.split(":");
+          dadosLinha[i] = dados[1];
+          i++;
+          System.out.println(dadosLinha);
+          if(line.startsWith("Quantidade")) {
+              modelo.addRow(dadosLinha);
+              i = 0;
+          }
+        }
+      }
+
+      scanner.close();
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public void atualizarTabela() {
+    DefaultTableModel modelo = (DefaultTableModel) getTabelaCliente().getModel();
+    modelo.setRowCount(0);
+    preenchePedidosTabela(modelo);
+  }
+
+    private String[] carregarProdutos() {
+
+    List<String> clientes = new ArrayList<>();
+    try (BufferedReader br = new BufferedReader(new FileReader("Produtos.txt"))) {
+      String line;
+      String combination = "";
+      while ((line = br.readLine()) != null) {
+        if (line.startsWith("ID: ")) {
+            combination = line.substring(4);
+        }
+        if (line.startsWith("Nome: ")) {
+            combination += line.substring(5);
+            clientes.add(combination); // Adiciona apenas o nome do cliente (após "Nome: ")
+        }
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    return clientes.toArray(new String[0]);
+
+  }
 
 }

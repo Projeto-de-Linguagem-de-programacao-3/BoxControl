@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import javax.swing.JPanel;
 
 import main.controller.actions.ButtonMenuListener;
+import main.model.entity.DadosFinanceiro;
 import main.view.components.MenuLateral;
 import main.view.components.TelaSwitch;
 import main.view.screens.Frame;
@@ -22,6 +23,7 @@ public class Main {
     criarArquivo("Produtos.txt");
     criarArquivo("Vendas.txt");
     criarArquivo("pedido.txt");
+    criarArquivoFinanceiro();
 
     // Instancia das classes principais
     Frame frame = new Frame();
@@ -62,7 +64,21 @@ public class Main {
         System.out.println("O arquivo " + nomeArquivo + " já existe.");
     } catch (IOException e) {
         e.printStackTrace();
-    }
+    }}
+
+    private static void criarArquivoFinanceiro() {
+      String caminhoArquivo = "financeiro.txt"; // Substitua "caminho/para/" pelo seu caminho real
+  
+      try {
+          Files.createFile(Paths.get(caminhoArquivo));
+          DadosFinanceiro dadosFinanceiro = new DadosFinanceiro();
+          dadosFinanceiro.registraBasico();
+          System.out.println("Arquivo " + caminhoArquivo + " criado com sucesso!");
+      } catch (FileAlreadyExistsException e) {
+          System.out.println("O arquivo " + caminhoArquivo + " já existe.");
+      } catch (IOException e) {
+          e.printStackTrace();
+      }
 }
 
 }

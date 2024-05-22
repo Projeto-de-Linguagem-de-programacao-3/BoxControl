@@ -84,7 +84,7 @@ public class DadosVendas {
             } else if (formaPagamento.equalsIgnoreCase("Fiado")) {
                 pWriter.println("Fiado: TU É DOIDO, AINDA QUER FIADO");
             } else if (formaPagamento.startsWith("À vista")) {
-                pWriter.println("À vista: 22% de desconto");
+                pWriter.println("À vista: 2% de desconto");
             }
 
             pWriter.println("Valor Total: " + total); // Adicionando o valor total calculado

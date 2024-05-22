@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JOptionPane;
 
+import main.model.entity.DadosFinanceiro;
 import main.model.entity.DadosProduto;
 import main.view.screens.TelasPrincipais.ProdutoPrincipal;
 
@@ -37,6 +38,7 @@ public class ButtonProdutoSalvarListener implements ActionListener {
 
     String resultado = produto.salvarTxt();
     JOptionPane.showMessageDialog(produtoPrincipal, resultado, "Resultado:", JOptionPane.INFORMATION_MESSAGE);
+    produtoPrincipal.atualizarTabela();
   }
   
 }

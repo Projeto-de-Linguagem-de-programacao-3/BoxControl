@@ -67,6 +67,8 @@ public class ButtonClientesSalvarListener implements ActionListener {
     // Chamar o método salvarTxt() para salvar os dados do cliente
     String resultado = cliente.salvarTxt();
     JOptionPane.showMessageDialog(clientePrincipal, resultado, "Resultado:", JOptionPane.INFORMATION_MESSAGE);
+    clientePrincipal.atualizarTabela();
+    
   }
   
 }

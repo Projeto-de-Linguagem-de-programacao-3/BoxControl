@@ -4,7 +4,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.NumberFormatter;
 
-import main.controller.actions.ButtonCaixaProdutosListener;
+
 import main.controller.actions.ButtonVendasSalvarListener;
 import main.view.components.CaixaProdutos;
 import main.view.components.StyleGuide;

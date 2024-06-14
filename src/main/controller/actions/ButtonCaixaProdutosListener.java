@@ -13,21 +13,22 @@ public class ButtonCaixaProdutosListener implements ActionListener {
 
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void actionPerformed(ActionEvent e) {
-    if(e.getSource() == vendasPrincipal.getCaixaProdutos().btnAdicionar) {
-            List<String> selecionadas = vendasPrincipal.getCaixaProdutos().listDisponiveis.getSelectedValuesList();
-            for(int i =0;i<selecionadas.size();i++){
-                String disciplina = selecionadas.get(i);
-                vendasPrincipal.getCaixaProdutos().modelSelecionadas.addElement(disciplina);
-            }
+    if (e.getSource() == vendasPrincipal.getCaixaProdutos().btnAdicionar) {
+      List<String> selecionadas = vendasPrincipal.getCaixaProdutos().listDisponiveis.getSelectedValuesList();
+      for (int i = 0; i < selecionadas.size(); i++) {
+        String disciplina = selecionadas.get(i);
+        vendasPrincipal.getCaixaProdutos().modelSelecionadas.addElement(disciplina);
+      }
     } else {
-        List<String> selecionadas = vendasPrincipal.getCaixaProdutos().listSelecionadas.getSelectedValuesList();
-        for(int i=0;i<selecionadas.size();i++){
-            String disciplina = selecionadas.get(i);
-            vendasPrincipal.getCaixaProdutos().modelSelecionadas.removeElement(disciplina);
-        }
+      List<String> selecionadas = vendasPrincipal.getCaixaProdutos().listSelecionadas.getSelectedValuesList();
+      for (int i = 0; i < selecionadas.size(); i++) {
+        String disciplina = selecionadas.get(i);
+        vendasPrincipal.getCaixaProdutos().modelSelecionadas.removeElement(disciplina);
+      }
     }
   }
-  
+
 }

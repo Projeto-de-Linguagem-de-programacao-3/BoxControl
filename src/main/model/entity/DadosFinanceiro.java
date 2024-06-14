@@ -106,7 +106,6 @@ public class DadosFinanceiro {
       valorFinal = precoCompra * quantidadeProduto;
       System.out.println(valorFinal);
       try {
-        File file2 = new File("financeiro.txt");
         Scanner scanner2 = new Scanner(file);
         String valorAtual = "";
         while (scanner.hasNextLine()) {

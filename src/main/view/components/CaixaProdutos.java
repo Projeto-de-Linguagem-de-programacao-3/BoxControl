@@ -15,16 +15,21 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
 public class CaixaProdutos extends JComponent {
-  private JLabel labelDisponiveis;
-    private JList listDisponiveis;
+
+    private JLabel labelDisponiveis;
     private DefaultListModel<String> modelDisponiveis;
-    private JButton btnAdicionar;
+    public JButton btnAdicionar;
     private JLabel labelSelecionadas;
-    private JList listSelecionadas;
-    private DefaultListModel<String> modelSelecionadas;
+
+    @SuppressWarnings("rawtypes")
+    public JList listDisponiveis;
+    @SuppressWarnings("rawtypes")
+    public JList listSelecionadas;
+    public DefaultListModel<String> modelSelecionadas;
     private JButton btnRemover;
 
     /* Construtores ----------------------------------------------------- */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public CaixaProdutos() {
         GridLayout gridLayout = new GridLayout(0, 2);
         gridLayout.setHgap(15);
@@ -46,9 +51,9 @@ public class CaixaProdutos extends JComponent {
         listDisponiveis.setFixedCellHeight(15);
         listDisponiveis.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         btnAdicionar = new JButton("adicionar >>");
-        btnAdicionar.addActionListener( (ActionEvent e)->{
+        btnAdicionar.addActionListener((ActionEvent e) -> {
             List<String> selecionadas = listDisponiveis.getSelectedValuesList();
-            for(int i =0;i<selecionadas.size();i++){
+            for (int i = 0; i < selecionadas.size(); i++) {
                 String disciplina = selecionadas.get(i);
                 modelSelecionadas.addElement(disciplina);
             }
@@ -62,14 +67,14 @@ public class CaixaProdutos extends JComponent {
         listSelecionadas.setFixedCellHeight(15);
         listSelecionadas.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         btnRemover = new JButton("<< remover");
-        btnRemover.addActionListener((ActionEvent e)->{
+        btnRemover.addActionListener((ActionEvent e) -> {
             List<String> selecionadas = listSelecionadas.getSelectedValuesList();
-            for(int i=0;i<selecionadas.size();i++){
+            for (int i = 0; i < selecionadas.size(); i++) {
                 String disciplina = selecionadas.get(i);
                 modelSelecionadas.removeElement(disciplina);
             }
         });
-      
+
         // configurar o layout da esquerda
         JPanel painelEsquerda = new JPanel(new BorderLayout());
         painelEsquerda.add(labelDisponiveis, BorderLayout.NORTH);
@@ -90,6 +95,7 @@ public class CaixaProdutos extends JComponent {
     /* Métodos ---------------------------------------------------------- */
 
     /* Classes internas ---------------------------------------------------- */
+    @SuppressWarnings("unchecked")
     public void eventoAdicao(ActionEvent e) {
         // código que deve ser executado quando o btn adicionar for clicado
         System.out.println("EVENTO ADIÇÃO");
@@ -103,6 +109,7 @@ public class CaixaProdutos extends JComponent {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void eventoRemocao(ActionEvent e) {
         // código que deve ser executado quando o btn remover for clicado
         System.out.println("EVENTO REMOÇÃO");

@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JOptionPane;
 
-import main.model.entity.DadosFinanceiro;
 import main.model.entity.DadosProduto;
 import main.view.screens.TelasPrincipais.ProdutoPrincipal;
 

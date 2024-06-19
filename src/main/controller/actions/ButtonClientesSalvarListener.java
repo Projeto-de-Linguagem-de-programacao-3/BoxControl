@@ -25,14 +25,14 @@ public class ButtonClientesSalvarListener implements ActionListener {
     String limiteCreditoText = clientePrincipal.getTextCredito().getText(); // Obter o texto do limite de crédito
 
     // Verificar se o CPF tem exatamente 11 caracteres
-    if (cpf.length() == 11) {
+    if (cpf.length() != 11) {
       JOptionPane.showMessageDialog(clientePrincipal, "O CPF deve ter exatamente 11 números.", "Erro de validação",
           JOptionPane.ERROR_MESSAGE);
       return;
     }
 
-    // Verificar se o RG tem exatamente 9 caracteres
-    if (rg.length() == 10) {
+    // Verificar se o RG tem exatamente 10 caracteres
+    if (rg.length() != 10) {
       JOptionPane.showMessageDialog(clientePrincipal, "O RG deve ter exatamente 10 números.", "Erro de validação",
           JOptionPane.ERROR_MESSAGE);
       return;
@@ -44,7 +44,7 @@ public class ButtonClientesSalvarListener implements ActionListener {
       if (!limiteCreditoText.isEmpty()) {
         limiteCredito = Double.parseDouble(limiteCreditoText);
         if (limiteCredito <= 0) {
-          JOptionPane.showMessageDialog(clientePrincipal, "O limite de crédito deve ser até 0.",
+          JOptionPane.showMessageDialog(clientePrincipal, "O limite de crédito deve ser maior que 0.",
               "Erro de validação", JOptionPane.ERROR_MESSAGE);
           return;
         }
@@ -64,11 +64,14 @@ public class ButtonClientesSalvarListener implements ActionListener {
     cliente.setDataNascimento(dataNascimento);
     cliente.setLimiteCredito(limiteCredito);
 
-    // Chamar o método salvarTxt() para salvar os dados do cliente
-    String resultado = cliente.salvarTxt();
-    JOptionPane.showMessageDialog(clientePrincipal, resultado, "Resultado:", JOptionPane.INFORMATION_MESSAGE);
-    clientePrincipal.atualizarTabela();
-    
+    // Aqui você pode realizar outra ação com os dados do cliente, como salvar em um
+    // banco de dados, atualizar registros, etc.
+    // Exemplo:
+    // clienteDAO.salvar(cliente);
+
+    // Exibir mensagem de sucesso
+    JOptionPane.showMessageDialog(clientePrincipal, "Cliente salvo com sucesso!", "Resultado:",
+        JOptionPane.INFORMATION_MESSAGE);
+    clientePrincipal.atualizarTabela(); // Método fictício para atualizar a tabela na interface
   }
-  
 }

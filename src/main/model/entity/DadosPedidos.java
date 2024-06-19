@@ -1,8 +1,6 @@
 package main.model.entity;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+
 
 public class DadosPedidos {
 
@@ -54,25 +52,5 @@ public class DadosPedidos {
     }
 
     // Método para imprimir os detalhes do pedido em um arquivo de texto
-    public String salvarTxt() {
-        try {
-            FileWriter fWriter = new FileWriter("Pedido.txt", true);
-            PrintWriter pWriter = new PrintWriter(fWriter);
 
-            pWriter.println("\nPedido de Produto:");
-            pWriter.println("Produto: " + this.produto);
-            pWriter.println("Preço de Compra: R$ " + this.precoCompra);
-            pWriter.println("Fabricante: " + this.fabricante);
-            pWriter.println("Validade: " + this.validade);
-            pWriter.println("Quantidade: " + this.quantidade);
-
-            pWriter.close(); // Fechar o PrintWriter para liberar os recursos
-
-            return "Detalhes do pedido registrados com sucesso.";
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "Falha ao registrar os detalhes do pedido. Verifique o arquivo Pedido.txt.";
-        }
-    }
 }

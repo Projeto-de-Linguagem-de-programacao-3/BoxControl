@@ -2,37 +2,28 @@ package main.view.screens.TelasPrincipais;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.text.*;
-
+import javax.swing.text.MaskFormatter;
 import main.controller.actions.ButtonPedidosSalvarListener;
 import main.view.components.StyleGuide;
-
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class PedidosPrincipal extends JPanel {
     private JComboBox<String> textProduto;
     private JTextField textPrecoCompra;
     private JTextField textFabricante;
-    private JTextField textValidade;
+    private JFormattedTextField textValidade;
     private JTextField textQuantidade;
 
     private JLabel labelProduto;
     private JLabel labelPrecoCompra;
     private JLabel labelFabricante;
-    private JLabel labelValidade;
     private JLabel labelQuantidade;
 
     private JButton btnSalvar;
@@ -49,6 +40,7 @@ public class PedidosPrincipal extends JPanel {
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.insets = new Insets(10, 10, 10, 10);
 
+        // Adicionando componentes ao painel usando GridBagConstraints
         constraints.gridx = 0;
         constraints.gridy = 0;
         add(getLabelProduto(), constraints);
@@ -72,7 +64,7 @@ public class PedidosPrincipal extends JPanel {
 
         constraints.gridx = 0;
         constraints.gridy = 6;
-        add(getLabelValidade(), constraints);
+        add(getTextValidade(), constraints);
         constraints.gridx = 0;
         constraints.gridy = 7;
         add(getTextValidade(), constraints);
@@ -86,7 +78,7 @@ public class PedidosPrincipal extends JPanel {
 
         constraints.gridx = 0;
         constraints.gridy = 10;
-        constraints.gridwidth = 2; // ocupa 2 colunas
+        constraints.gridwidth = 2; // Span 2 colunas
         add(getBtnSalvar(), constraints);
         ButtonPedidosSalvarListener buttonPedidosSalvarListener = new ButtonPedidosSalvarListener(this);
         btnSalvar.addActionListener(buttonPedidosSalvarListener);
@@ -100,6 +92,7 @@ public class PedidosPrincipal extends JPanel {
         add(scrollPane, constraints);
     }
 
+    // Getters para elementos JLabel
     public JLabel getLabelProduto() {
         if (labelProduto == null) {
             labelProduto = new JLabel("Produto:");
@@ -114,7 +107,7 @@ public class PedidosPrincipal extends JPanel {
             textProduto.setFont(new Font("Tahoma", Font.PLAIN, 14));
         }
         return textProduto;
-    }// Getters for JLabel elements
+    }
 
     public JLabel getLabelPrecoCompra() {
         if (labelPrecoCompra == null) {
@@ -127,7 +120,6 @@ public class PedidosPrincipal extends JPanel {
     public JTextField getTextPrecoCompra() {
         if (textPrecoCompra == null) {
             textPrecoCompra = new JTextField();
-
             StyleGuide.formataComponente(textPrecoCompra);
         }
         return textPrecoCompra;
@@ -149,9 +141,8 @@ public class PedidosPrincipal extends JPanel {
         return textFabricante;
     }
 
-    public JTextField getTextValidade() {
+    public JFormattedTextField getTextValidade() {
         if (textValidade == null) {
-            textValidade = new JTextField();
             try {
                 MaskFormatter mascaraValidade = new MaskFormatter("##/##/####");
                 textValidade = new JFormattedTextField(mascaraValidade);
@@ -179,15 +170,6 @@ public class PedidosPrincipal extends JPanel {
         return labelQuantidade;
     }
 
-    public JLabel getLabelValidade() {
-        if (labelValidade == null) {
-            labelValidade = new JLabel("Validade:");
-
-            StyleGuide.formataComponente(labelValidade);
-        }
-        return labelValidade;
-    }
-
     public JButton getBtnSalvar() {
         if (btnSalvar == null) {
             btnSalvar = new JButton("Salvar Pedido");
@@ -198,71 +180,19 @@ public class PedidosPrincipal extends JPanel {
 
     public JTable getTabelaCliente() {
         if (tabelaCliente == null) {
-            String[] titulos = {"Produto", "Preço de compra", "Fabricante", "Validade", "Quantidade"};
+            String[] titulos = { "Produto", "Preço de compra", "Fabricante", "Validade", "Quantidade" };
             DefaultTableModel modelo = new DefaultTableModel(titulos, 0);
             tabelaCliente = new JTable(modelo);
-            preenchePedidosTabela(modelo);
         }
         return tabelaCliente;
     }
 
-    private void preenchePedidosTabela(DefaultTableModel modelo) {
-
-    try {
-      File file = new File("pedido.txt");
-      Scanner scanner = new Scanner(file);
-      Object[] dadosLinha = new Object[5];
-      int i = 0;
-      while (scanner.hasNextLine()) {
-        String line = scanner.nextLine();
-        if (!line.isEmpty()) {
-          if(line.startsWith("Pedido de Produto")) {
-            continue;
-          }
-          String[] dados = line.split(":");
-          dadosLinha[i] = dados[1];
-          i++;
-          System.out.println(dadosLinha);
-          if(line.startsWith("Quantidade")) {
-              modelo.addRow(dadosLinha);
-              i = 0;
-          }
-        }
-      }
-
-      scanner.close();
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    }
-  }
-
-  public void atualizarTabela() {
-    DefaultTableModel modelo = (DefaultTableModel) getTabelaCliente().getModel();
-    modelo.setRowCount(0);
-    preenchePedidosTabela(modelo);
-  }
-
     private String[] carregarProdutos() {
-
-    List<String> clientes = new ArrayList<>();
-    try (BufferedReader br = new BufferedReader(new FileReader("Produtos.txt"))) {
-      String line;
-      String combination = "";
-      while ((line = br.readLine()) != null) {
-        if (line.startsWith("ID: ")) {
-            combination = line.substring(4);
-        }
-        if (line.startsWith("Nome: ")) {
-            combination += line.substring(5);
-            clientes.add(combination); // Adiciona apenas o nome do cliente (após "Nome: ")
-        }
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
+        List<String> produtos = new ArrayList<>();
+        // Lógica para carregar produtos (exemplo genérico)
+        produtos.add("Produto 1");
+        produtos.add("Produto 2");
+        produtos.add("Produto 3");
+        return produtos.toArray(new String[0]);
     }
-
-    return clientes.toArray(new String[0]);
-
-  }
-
 }

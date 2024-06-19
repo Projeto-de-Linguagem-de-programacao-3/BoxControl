@@ -5,30 +5,33 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 import main.view.screens.TelasPrincipais.VendasPrincipal;
+import main.view.components.CaixaProdutos; // Ensure you import the correct package
 
 public class ButtonCaixaProdutosListener implements ActionListener {
-  VendasPrincipal vendasPrincipal;
+  private VendasPrincipal vendasPrincipal;
 
   public ButtonCaixaProdutosListener(VendasPrincipal vendasPrincipal) {
-
+    this.vendasPrincipal = vendasPrincipal;
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public void actionPerformed(ActionEvent e) {
-    if (e.getSource() == vendasPrincipal.getCaixaProdutos().btnAdicionar) {
-      List<String> selecionadas = vendasPrincipal.getCaixaProdutos().listDisponiveis.getSelectedValuesList();
-      for (int i = 0; i < selecionadas.size(); i++) {
-        String disciplina = selecionadas.get(i);
-        vendasPrincipal.getCaixaProdutos().modelSelecionadas.addElement(disciplina);
-      }
-    } else {
-      List<String> selecionadas = vendasPrincipal.getCaixaProdutos().listSelecionadas.getSelectedValuesList();
-      for (int i = 0; i < selecionadas.size(); i++) {
-        String disciplina = selecionadas.get(i);
-        vendasPrincipal.getCaixaProdutos().modelSelecionadas.removeElement(disciplina);
+    CaixaProdutos caixaProdutos = vendasPrincipal.getCaixaProdutos();
+    if (caixaProdutos != null) {
+      if (e.getSource() == caixaProdutos.btnAdicionar) {
+        List<String> selecionadas = caixaProdutos.listDisponiveis.getSelectedValuesList();
+        for (int i = 0; i < selecionadas.size(); i++) {
+          String disciplina = selecionadas.get(i);
+          caixaProdutos.modelSelecionadas.addElement(disciplina);
+        }
+      } else {
+        List<String> selecionadas = caixaProdutos.listSelecionadas.getSelectedValuesList();
+        for (int i = 0; i < selecionadas.size(); i++) {
+          String disciplina = selecionadas.get(i);
+          caixaProdutos.modelSelecionadas.removeElement(disciplina);
+        }
       }
     }
   }
-
 }

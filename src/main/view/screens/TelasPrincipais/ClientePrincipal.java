@@ -9,11 +9,8 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.Scanner;
+
 
 public class ClientePrincipal extends JPanel {
   private JLabel labelNome;
@@ -89,6 +86,9 @@ public class ClientePrincipal extends JPanel {
     JScrollPane scrollPane = new JScrollPane(getTabelaCliente());
     scrollPane.setMinimumSize(new Dimension(100, 300));
     add(scrollPane, constraints);
+
+    // Preencher a tabela inicialmente
+    atualizarTabela();
   }
 
   public JLabel getLabelNome() {
@@ -120,11 +120,11 @@ public class ClientePrincipal extends JPanel {
       try {
         MaskFormatter mascaraCpf = new MaskFormatter("###.###.###-##");
         textCPF = new JFormattedTextField(mascaraCpf);
+        StyleGuide.formataComponente(textCPF);
       } catch (ParseException e) {
         e.printStackTrace();
       }
     }
-
     return textCPF;
   }
 
@@ -138,11 +138,10 @@ public class ClientePrincipal extends JPanel {
 
   public JTextField getTextRG() {
     if (textRG == null) {
-      textRG = new JTextField(); // Ajustar o tamanho como desejado
       try {
-        // Definir um MaskFormatter para o formato de data
         MaskFormatter dateFormatter = new MaskFormatter("##.###.###-##");
         textRG = new JFormattedTextField(dateFormatter);
+        StyleGuide.formataComponente(textRG);
       } catch (ParseException e) {
         e.printStackTrace();
       }
@@ -160,15 +159,13 @@ public class ClientePrincipal extends JPanel {
 
   public JFormattedTextField getTextNascimento() {
     if (textNascimento == null) {
-      textNascimento = new JFormattedTextField();
       try {
-        // Definir um MaskFormatter para o formato de data
         MaskFormatter dateFormatter = new MaskFormatter("##/##/####");
         textNascimento = new JFormattedTextField(dateFormatter);
+        StyleGuide.formataComponente(textNascimento);
       } catch (ParseException e) {
         e.printStackTrace();
       }
-      StyleGuide.formataComponente(textNascimento);
     }
     return textNascimento;
   }
@@ -183,18 +180,14 @@ public class ClientePrincipal extends JPanel {
 
   public JTextField getTextCredito() {
     if (textCredito == null) {
-
-      NumberFormat numberFormat = NumberFormat.getNumberInstance();
-      numberFormat.setGroupingUsed(false);
-      NumberFormatter numberFormatter = new NumberFormatter(numberFormat);
+      NumberFormatter numberFormatter = new NumberFormatter();
       numberFormatter.setValueClass(Double.class);
-      numberFormatter.setAllowsInvalid(false); // Não permite caracteres não numéricos
-      numberFormatter.setMinimum(0.0); // Define um valor mínimo
+      numberFormatter.setAllowsInvalid(false);
+      numberFormatter.setMinimum(0.0);
 
       textCredito = new JFormattedTextField(numberFormatter);
       textCredito.setColumns(10); // Ajustar o tamanho como desejado
       StyleGuide.formataComponente(textCredito);
-
     }
     return textCredito;
   }
@@ -212,63 +205,23 @@ public class ClientePrincipal extends JPanel {
       String[] titulos = { "ID", "Nome", "CPF", "RG", "Data de Nascimento", "Limite de Crédito" };
       DefaultTableModel modelo = new DefaultTableModel(titulos, 0);
       tabelaCliente = new JTable(modelo);
-      preencheClienteName(modelo);
     }
     return tabelaCliente;
   }
 
-  private void preencheClienteName(DefaultTableModel modelo) {
-
-    /**
-     * try {
-     * File file = new File("cliente.txt");
-     * Scanner scanner = new Scanner(file);
-     * 
-     * while (scanner.hasNextLine()) {
-     * String linha = scanner.nextLine();
-     * if (linha.startsWith("Nome: ")) {
-     * String nome = linha.substring(6).trim(); // Extrai o nome após "Nome: " e
-     * 
-     * System.out.println(nome);
-     * }
-     * }
-     * scanner.close();
-     * } catch (FileNotFoundException e) {
-     * e.printStackTrace();
-     * }
-     **/
-
-    try {
-      File file = new File("cliente.txt");
-      Scanner scanner = new Scanner(file);
-      Object[] dadosLinha = new Object[6];
-      int i = 0;
-      while (scanner.hasNextLine()) {
-        String line = scanner.nextLine();
-        if (!line.isEmpty()) {
-          if (line.startsWith("Cliente")) {
-            continue;
-          }
-          String[] dados = line.split(":");
-          dadosLinha[i] = dados[1];
-          i++;
-          System.out.println(dadosLinha);
-          if (line.startsWith("Limite de Crédito")) {
-            modelo.addRow(dadosLinha);
-            i = 0;
-          }
-        }
-      }
-
-      scanner.close();
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    }
-  }
-
   public void atualizarTabela() {
     DefaultTableModel modelo = (DefaultTableModel) getTabelaCliente().getModel();
-    modelo.setRowCount(0);
-    preencheClienteName(modelo);
+    modelo.setRowCount(0); // Limpa a tabela antes de adicionar novos dados
+
+    // Aqui você pode carregar os dados dos clientes de uma fonte de dados, como um
+    // banco de dados
+    // ou, se necessário, de um arquivo (como no exemplo anterior)
+
+    // Exemplo de dados fictícios para preenchimento inicial da tabela
+    Object[] dadosCliente1 = { 1, "João da Silva", "123.456.789-00", "12.345.678-9", "01/01/1980", 1000.0 };
+    Object[] dadosCliente2 = { 2, "Maria Oliveira", "987.654.321-00", "98.765.432-1", "15/06/1990", 1500.0 };
+
+    modelo.addRow(dadosCliente1);
+    modelo.addRow(dadosCliente2);
   }
 }

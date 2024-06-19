@@ -2,19 +2,14 @@ package main.view.screens.TelasPrincipais;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.text.*;
+import javax.swing.text.MaskFormatter;
 import main.controller.actions.ButtonProdutoSalvarListener;
 import main.view.components.StyleGuide;
-
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.Scanner;
 
 public class ProdutoPrincipal extends JPanel {
     private JTextField textNome;
@@ -22,7 +17,7 @@ public class ProdutoPrincipal extends JPanel {
     private JTextField textPrecoCompra;
     private JTextField textPrecoVenda;
     private JTextField textFabricante;
-    private JTextField textValidade;
+    private JFormattedTextField textValidade;
     private JTextField textQuantidadeEstoque;
 
     private JLabel labelNome;
@@ -107,8 +102,8 @@ public class ProdutoPrincipal extends JPanel {
         constraints.gridy = 0;
         constraints.gridwidth = 2;
         constraints.gridheight = 14;
-        JScrollPane scrollPane = new JScrollPane(getTabelaCliente());
-        scrollPane.setMinimumSize(new Dimension(100,500));
+        JScrollPane scrollPane = new JScrollPane(getTabelaProduto());
+        scrollPane.setMinimumSize(new Dimension(100, 500));
         add(scrollPane, constraints);
     }
 
@@ -170,7 +165,7 @@ public class ProdutoPrincipal extends JPanel {
 
     public JButton getBtnSalvar() {
         if (btnSalvar == null) {
-            btnSalvar = new JButton("Salvar cliente");
+            btnSalvar = new JButton("Salvar Produto");
             StyleGuide.formataComponente(btnSalvar);
         }
         return btnSalvar;
@@ -194,13 +189,7 @@ public class ProdutoPrincipal extends JPanel {
 
     public JTextField getTextPrecoCompra() {
         if (textPrecoCompra == null) {
-            NumberFormat numberFormat = NumberFormat.getNumberInstance();
-            numberFormat.setGroupingUsed(false);
-            NumberFormatter numberFormatter = new NumberFormatter(numberFormat);
-            numberFormatter.setValueClass(Double.class);
-            numberFormatter.setAllowsInvalid(false); // Não permite caracteres não numéricos
-            numberFormatter.setMinimum(0.0); // Define um valor mínimo
-            textPrecoCompra = new JFormattedTextField(numberFormatter);
+            textPrecoCompra = new JTextField();
             StyleGuide.formataComponente(textPrecoCompra);
         }
         return textPrecoCompra;
@@ -208,13 +197,7 @@ public class ProdutoPrincipal extends JPanel {
 
     public JTextField getTextPrecoVenda() {
         if (textPrecoVenda == null) {
-            NumberFormat numberFormat = NumberFormat.getNumberInstance();
-            numberFormat.setGroupingUsed(false);
-            NumberFormatter numberFormatter = new NumberFormatter(numberFormat);
-            numberFormatter.setValueClass(Double.class);
-            numberFormatter.setAllowsInvalid(false); // Não permite caracteres não numéricos
-            numberFormatter.setMinimum(0.0); // Define um valor mínimo
-            textPrecoVenda = new JFormattedTextField(numberFormatter);
+            textPrecoVenda = new JTextField();
             StyleGuide.formataComponente(textPrecoVenda);
         }
         return textPrecoVenda;
@@ -228,78 +211,34 @@ public class ProdutoPrincipal extends JPanel {
         return textFabricante;
     }
 
-    public JTextField getTextValidade() {
+    public JFormattedTextField getTextValidade() {
         if (textValidade == null) {
-            textValidade = new JTextField();
-            StyleGuide.formataComponente(textValidade);
             try {
                 MaskFormatter mascaraValidade = new MaskFormatter("##/##/####");
                 textValidade = new JFormattedTextField(mascaraValidade);
+                StyleGuide.formataComponente(textValidade);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-
         }
         return textValidade;
     }
 
     public JTextField getTextQuantidadeEstoque() {
         if (textQuantidadeEstoque == null) {
-            NumberFormat numberFormat = NumberFormat.getNumberInstance();
-            numberFormat.setGroupingUsed(false);
-            NumberFormatter numberFormatter = new NumberFormatter(numberFormat);
-            numberFormatter.setValueClass(Double.class);
-            numberFormatter.setAllowsInvalid(false); // Não permite caracteres não numéricos
-            numberFormatter.setMinimum(0.0); // Define um valor mínimo
-
-            textQuantidadeEstoque = new JFormattedTextField(numberFormatter);
+            textQuantidadeEstoque = new JTextField();
             StyleGuide.formataComponente(textQuantidadeEstoque);
         }
         return textQuantidadeEstoque;
     }
 
-    public JTable getTabelaCliente() {
+    public JTable getTabelaProduto() {
         if (tabelaProduto == null) {
-            String[] titulos = {"ID", "Nome", "Tipo", "Preço Compra", "Preço Venda", "Fabricante", "Validade", "Quantidade Estoque"};
+            String[] titulos = { "ID", "Nome", "Tipo", "Preço Compra", "Preço Venda", "Fabricante", "Validade",
+                    "Quantidade Estoque" };
             DefaultTableModel modelo = new DefaultTableModel(titulos, 0);
             tabelaProduto = new JTable(modelo);
-            preencheProdutoTable(modelo);
         }
         return tabelaProduto;
-    }
-
-    private void preencheProdutoTable(DefaultTableModel modelo) {
-        try {
-      File file = new File("Produtos.txt");
-      Scanner scanner = new Scanner(file);
-      Object[] dadosLinha = new Object[8];
-      int i = 0;
-      while (scanner.hasNextLine()) {
-        String line = scanner.nextLine();
-        if (!line.isEmpty()) {
-          if(line.startsWith("Produto")) {
-            continue;
-          }
-          String[] dados = line.split(":");
-          dadosLinha[i] = dados[1];
-          i++;
-          System.out.println(dadosLinha);
-          if(line.startsWith("Quantidade em Estoque")) {
-              modelo.addRow(dadosLinha);
-              i = 0;
-          }
-        }
-      }
-
-      scanner.close();
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    }
-    }
-
-    public void atualizarTabela() {
-        DefaultTableModel modelo = (DefaultTableModel) getTabelaCliente().getModel();
-        modelo.setRowCount(0);
-        preencheProdutoTable(modelo);
     }
 }

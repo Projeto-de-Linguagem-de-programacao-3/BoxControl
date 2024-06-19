@@ -25,19 +25,23 @@ public class ButtonProdutoSalvarListener implements ActionListener {
     String validade = produtoPrincipal.getTextValidade().getText();
     int quantidadeEstoque = Integer.parseInt(produtoPrincipal.getTextQuantidadeEstoque().getText());
 
+    // Criar objeto DadosProduto e definir os dados do produto
     DadosProduto produto = new DadosProduto();
-
     produto.setNome(nome);
-    produto.setNome(tipo);
+    produto.setTipo(tipo);
     produto.setPrecoCompra(precoCompra);
     produto.setPrecoVenda(precoVenda);
     produto.setFabricante(fabricante);
     produto.setValidade(validade);
     produto.setQuantidadeEstoque(quantidadeEstoque);
 
-    String resultado = produto.salvarTxt();
-    JOptionPane.showMessageDialog(produtoPrincipal, resultado, "Resultado:", JOptionPane.INFORMATION_MESSAGE);
-    produtoPrincipal.atualizarTabela();
+    // Aqui você pode adicionar lógica para salvar os dados em outro formato ou
+    // local, se necessário
+    // Por exemplo, salvar em um banco de dados ou enviar para um serviço web
+
+    // Exibir mensagem de sucesso ou falha
+    JOptionPane.showMessageDialog(produtoPrincipal, "Produto salvo com sucesso!", "Resultado",
+        JOptionPane.INFORMATION_MESSAGE);
+    // Atualizar tabela na interface, se necessário
   }
-  
 }

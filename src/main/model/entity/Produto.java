@@ -1,10 +1,6 @@
 package main.model.entity;
 
-
-
-public class DadosProduto {
-
-   
+public class Produto {
     private int id;
     private String nome;
     private String tipo;
@@ -76,6 +72,11 @@ public class DadosProduto {
 
     public void setQuantidadeEstoque(int quantidadeEstoque) {
         this.quantidadeEstoque = quantidadeEstoque;
+    }
+
+    @Override
+    public String toString() {
+        return this.getNome();
     }
 
 }

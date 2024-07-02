@@ -3,6 +3,8 @@ package main.view.screens.TelasPrincipais;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.table.DefaultTableModel;
+
+import main.controller.actions.ButtonHomeGerarBalanco;
 import main.view.components.StyleGuide;
 import main.view.components.TabelaConsulta;
 
@@ -22,29 +24,15 @@ public class HomePrincipal extends JPanel {
 
         // Initialize and add components
         add(getBotaoInternalFrame());
-        add(getTabelaConsulta());
+        ButtonHomeGerarBalanco buttonHomeGerarBalanco = new ButtonHomeGerarBalanco(this);
+        botaoInternalFrame.addActionListener(buttonHomeGerarBalanco);
     }
 
     public JButton getBotaoInternalFrame() {
         if (botaoInternalFrame == null) {
-            botaoInternalFrame = new JButton("Consultar XX");
-            // Set button bounds if necessary
-            // botaoInternalFrame.setBounds(100, 100, 100, 100);
+            botaoInternalFrame = new JButton("Gerar Balanço");
             StyleGuide.formataComponente(botaoInternalFrame); // Apply styling
         }
         return botaoInternalFrame;
-    }
-
-    public TabelaConsulta getTabelaConsulta() {
-        if (tabelaConsulta == null) {
-            DefaultTableModel modelo = new DefaultTableModel();
-            modelo.addColumn("Nome", new Class[]{String.class});
-            modelo.addColumn("CPF", new Class[]{String.class});
-            modelo.addColumn("RG", new Class[]{String.class});
-            modelo.addColumn("DataNascimento", new Class[]{String.class});
-            modelo.addColumn("LimiteDeCredito", new Class[]{String.class});
-            tabelaConsulta = new TabelaConsulta(modelo);
-        }
-        return tabelaConsulta;
     }
 }

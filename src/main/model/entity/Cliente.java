@@ -1,7 +1,7 @@
 package main.model.entity;
 
 
-public class DadosCliente {
+public class Cliente {
 
     private int id;
     private String nome;
@@ -58,6 +58,11 @@ public class DadosCliente {
 
     public void setLimiteCredito(double limiteCredito) {
         this.limiteCredito = limiteCredito;
+    }
+
+    @Override
+    public String toString() {
+        return this.getNome();
     }
 
 }

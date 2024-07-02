@@ -3,22 +3,28 @@ package main.view.screens.TelasPrincipais;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.MaskFormatter;
+import javax.swing.text.NumberFormatter;
+
 import main.controller.actions.ButtonProdutoSalvarListener;
+import main.model.database.ProdutoDatabase;
 import main.view.components.StyleGuide;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.List;
 
 public class ProdutoPrincipal extends JPanel {
     private JTextField textNome;
     private JTextField textTipo;
-    private JTextField textPrecoCompra;
-    private JTextField textPrecoVenda;
+    private JFormattedTextField textPrecoCompra;
+    private JFormattedTextField textPrecoVenda;
     private JTextField textFabricante;
     private JFormattedTextField textValidade;
-    private JTextField textQuantidadeEstoque;
+    private JFormattedTextField textQuantidadeEstoque;
 
     private JLabel labelNome;
     private JLabel labelTipo;
@@ -29,6 +35,7 @@ public class ProdutoPrincipal extends JPanel {
     private JLabel labelQuantidadeEstoque;
 
     private JButton btnSalvar;
+    private JButton btnAtualizarTabela;
 
     private JTable tabelaProduto;
 
@@ -100,11 +107,20 @@ public class ProdutoPrincipal extends JPanel {
 
         constraints.gridx = 2;
         constraints.gridy = 0;
+        add(getBtnAtualizarTabela(), constraints);
+        btnAtualizarTabela.addActionListener((ActionEvent e) -> {
+            atualizarTabela();
+        });
+
+        constraints.gridx = 2;
+        constraints.gridy = 1;
         constraints.gridwidth = 2;
         constraints.gridheight = 14;
         JScrollPane scrollPane = new JScrollPane(getTabelaProduto());
         scrollPane.setMinimumSize(new Dimension(100, 500));
         add(scrollPane, constraints);
+
+        atualizarTabela();
     }
 
     public JLabel getLabelNome() {
@@ -187,17 +203,29 @@ public class ProdutoPrincipal extends JPanel {
         return textTipo;
     }
 
-    public JTextField getTextPrecoCompra() {
+    public JFormattedTextField getTextPrecoCompra() {
         if (textPrecoCompra == null) {
-            textPrecoCompra = new JTextField();
+            NumberFormat numberFormat = NumberFormat.getNumberInstance();
+            numberFormat.setGroupingUsed(false);
+            NumberFormatter numberFormatter = new NumberFormatter(numberFormat);
+            numberFormatter.setValueClass(Double.class);
+            numberFormatter.setAllowsInvalid(false);
+            numberFormatter.setMinimum(0.0);
+            textPrecoCompra = new JFormattedTextField(numberFormatter);
             StyleGuide.formataComponente(textPrecoCompra);
         }
         return textPrecoCompra;
     }
 
-    public JTextField getTextPrecoVenda() {
+    public JFormattedTextField getTextPrecoVenda() {
         if (textPrecoVenda == null) {
-            textPrecoVenda = new JTextField();
+            NumberFormat numberFormat = NumberFormat.getNumberInstance();
+            numberFormat.setGroupingUsed(false);
+            NumberFormatter numberFormatter = new NumberFormatter(numberFormat);
+            numberFormatter.setValueClass(Double.class);
+            numberFormatter.setAllowsInvalid(false);
+            numberFormatter.setMinimum(0.0);
+            textPrecoVenda = new JFormattedTextField(numberFormatter);
             StyleGuide.formataComponente(textPrecoVenda);
         }
         return textPrecoVenda;
@@ -224,21 +252,49 @@ public class ProdutoPrincipal extends JPanel {
         return textValidade;
     }
 
-    public JTextField getTextQuantidadeEstoque() {
+    public JFormattedTextField getTextQuantidadeEstoque() {
         if (textQuantidadeEstoque == null) {
-            textQuantidadeEstoque = new JTextField();
+            NumberFormatter numberFormatter = new NumberFormatter();
+            numberFormatter.setValueClass(Double.class);
+            numberFormatter.setAllowsInvalid(false);
+            numberFormatter.setMinimum(0.0);
+            textQuantidadeEstoque = new JFormattedTextField(numberFormatter);
             StyleGuide.formataComponente(textQuantidadeEstoque);
         }
         return textQuantidadeEstoque;
+    }
+
+    public JButton getBtnAtualizarTabela() {
+        if(btnAtualizarTabela == null) {
+            btnAtualizarTabela = new JButton("Atualizar tabela de produtos");
+            StyleGuide.formataComponente(btnAtualizarTabela);
+        }
+        return btnAtualizarTabela;
     }
 
     public JTable getTabelaProduto() {
         if (tabelaProduto == null) {
             String[] titulos = { "ID", "Nome", "Tipo", "Preço Compra", "Preço Venda", "Fabricante", "Validade",
                     "Quantidade Estoque" };
-            DefaultTableModel modelo = new DefaultTableModel(titulos, 0);
+            DefaultTableModel modelo = new DefaultTableModel(titulos, 0) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
             tabelaProduto = new JTable(modelo);
         }
         return tabelaProduto;
+    }
+
+    public void atualizarTabela() {
+        DefaultTableModel modelo = (DefaultTableModel) getTabelaProduto().getModel();
+        modelo.setRowCount(0); // Limpa a tabela antes de adicionar novos dados
+        
+        ProdutoDatabase produtoDatabase = new ProdutoDatabase();
+        List<Object[]> dadosCliente = produtoDatabase.consultarProdutos();
+        for (Object[] linha : dadosCliente) {
+        modelo.addRow(linha);
+        }
     }
 }

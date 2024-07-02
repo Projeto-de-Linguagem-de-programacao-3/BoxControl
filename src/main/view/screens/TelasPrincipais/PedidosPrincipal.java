@@ -3,32 +3,42 @@ package main.view.screens.TelasPrincipais;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.MaskFormatter;
+import javax.swing.text.NumberFormatter;
+
 import main.controller.actions.ButtonPedidosSalvarListener;
+import main.model.database.PedidoDatabase;
+import main.model.database.ProdutoDatabase;
+import main.model.entity.Produto;
 import main.view.components.StyleGuide;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class PedidosPrincipal extends JPanel {
-    private JComboBox<String> textProduto;
-    private JTextField textPrecoCompra;
+    private JComboBox<Produto> textProduto;
+    private JFormattedTextField textPrecoCompra;
     private JTextField textFabricante;
     private JFormattedTextField textValidade;
-    private JTextField textQuantidade;
+    private JFormattedTextField textQuantidade;
 
     private JLabel labelProduto;
     private JLabel labelPrecoCompra;
     private JLabel labelFabricante;
+    private JLabel labelValidade;
+
     private JLabel labelQuantidade;
+    ProdutoDatabase produtoDatabase = new ProdutoDatabase();
 
     private JButton btnSalvar;
 
     private JTable tabelaCliente;
+    private JButton btnAtualizarProduto;
 
     public PedidosPrincipal() {
         super();
@@ -64,7 +74,7 @@ public class PedidosPrincipal extends JPanel {
 
         constraints.gridx = 0;
         constraints.gridy = 6;
-        add(getTextValidade(), constraints);
+        add(getLabelValidade(), constraints);
         constraints.gridx = 0;
         constraints.gridy = 7;
         add(getTextValidade(), constraints);
@@ -85,11 +95,20 @@ public class PedidosPrincipal extends JPanel {
 
         constraints.gridx = 2;
         constraints.gridy = 0;
+        add(getBtnAtualizarProduto(), constraints);
+        btnAtualizarProduto.addActionListener((ActionEvent e) -> {
+            carregarProdutos();
+        });
+
+        constraints.gridx = 2;
+        constraints.gridy = 1;
         constraints.gridwidth = 2;
         constraints.gridheight = 10;
         JScrollPane scrollPane = new JScrollPane(getTabelaCliente());
         scrollPane.setMinimumSize(new Dimension(100, 500));
         add(scrollPane, constraints);
+
+        atualizarTabela();
     }
 
     // Getters para elementos JLabel
@@ -101,10 +120,11 @@ public class PedidosPrincipal extends JPanel {
         return labelProduto;
     }
 
-    public JComboBox<String> getTextProduto() {
+    public JComboBox<Produto> getTextProduto() {
         if (textProduto == null) {
-            textProduto = new JComboBox<>(carregarProdutos());
+            textProduto = new JComboBox<Produto>();
             textProduto.setFont(new Font("Tahoma", Font.PLAIN, 14));
+            carregarProdutos();
         }
         return textProduto;
     }
@@ -117,9 +137,13 @@ public class PedidosPrincipal extends JPanel {
         return labelPrecoCompra;
     }
 
-    public JTextField getTextPrecoCompra() {
+    public JFormattedTextField getTextPrecoCompra() {
         if (textPrecoCompra == null) {
-            textPrecoCompra = new JTextField();
+            NumberFormatter numberFormatter = new NumberFormatter();
+            numberFormatter.setValueClass(Double.class);
+            numberFormatter.setAllowsInvalid(false);
+            numberFormatter.setMinimum(0.0);
+            textPrecoCompra = new JFormattedTextField(numberFormatter);
             StyleGuide.formataComponente(textPrecoCompra);
         }
         return textPrecoCompra;
@@ -141,6 +165,14 @@ public class PedidosPrincipal extends JPanel {
         return textFabricante;
     }
 
+    public JLabel getLabelValidade() {
+        if (labelValidade == null) {
+            labelValidade = new JLabel("Validade:");
+            StyleGuide.formataComponente(labelValidade);
+        }
+        return labelValidade;
+    }
+
     public JFormattedTextField getTextValidade() {
         if (textValidade == null) {
             try {
@@ -154,9 +186,15 @@ public class PedidosPrincipal extends JPanel {
         return textValidade;
     }
 
-    public JTextField getTextQuantidade() {
+    public JFormattedTextField getTextQuantidade() {
         if (textQuantidade == null) {
-            textQuantidade = new JTextField();
+            NumberFormat numberFormat = NumberFormat.getNumberInstance();
+            numberFormat.setGroupingUsed(false);
+            NumberFormatter numberFormatter = new NumberFormatter(numberFormat);
+            numberFormatter.setValueClass(Double.class);
+            numberFormatter.setAllowsInvalid(false);
+            numberFormatter.setMinimum(0.0);
+            textQuantidade = new JFormattedTextField(numberFormatter);
             StyleGuide.formataComponente(textQuantidade);
         }
         return textQuantidade;
@@ -178,21 +216,44 @@ public class PedidosPrincipal extends JPanel {
         return btnSalvar;
     }
 
+    public JButton getBtnAtualizarProduto() {
+        if(btnAtualizarProduto == null) {
+            btnAtualizarProduto = new JButton("Atualizar lista de produtos");
+            StyleGuide.formataComponente(btnAtualizarProduto);
+        }
+        return btnAtualizarProduto;
+    }
+
     public JTable getTabelaCliente() {
         if (tabelaCliente == null) {
-            String[] titulos = { "Produto", "Preço de compra", "Fabricante", "Validade", "Quantidade" };
-            DefaultTableModel modelo = new DefaultTableModel(titulos, 0);
+            String[] titulos = { "ID", "Produto", "Preço de compra", "Fabricante", "Validade", "Quantidade" };
+            DefaultTableModel modelo = new DefaultTableModel(titulos, 0) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
             tabelaCliente = new JTable(modelo);
         }
         return tabelaCliente;
     }
 
-    private String[] carregarProdutos() {
-        List<String> produtos = new ArrayList<>();
-        // Lógica para carregar produtos (exemplo genérico)
-        produtos.add("Produto 1");
-        produtos.add("Produto 2");
-        produtos.add("Produto 3");
-        return produtos.toArray(new String[0]);
+    public void atualizarTabela() {
+        DefaultTableModel modelo = (DefaultTableModel) getTabelaCliente().getModel();
+        modelo.setRowCount(0); // Limpa a tabela antes de adicionar novos dados
+        
+        PedidoDatabase pedidoDatabase = new PedidoDatabase();
+        List<Object[]> dadosCliente = pedidoDatabase.consultarPedidos();
+        for (Object[] linha : dadosCliente) {
+        modelo.addRow(linha);
+        }
+    }
+
+    private void carregarProdutos() {
+        List<Produto> produtos = produtoDatabase.listarProdutosComboBox();
+        textProduto.removeAllItems();       
+        for (Produto produto : produtos) {
+            textProduto.addItem(produto);
+        }
     }
 }

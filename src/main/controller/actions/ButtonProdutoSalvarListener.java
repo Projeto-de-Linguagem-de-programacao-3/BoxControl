@@ -2,10 +2,15 @@ package main.controller.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import javax.swing.JOptionPane;
 
-import main.model.entity.DadosProduto;
+import main.model.database.ProdutoDatabase;
+import main.model.entity.Produto;
 import main.view.screens.TelasPrincipais.ProdutoPrincipal;
 
 public class ButtonProdutoSalvarListener implements ActionListener {
@@ -25,8 +30,12 @@ public class ButtonProdutoSalvarListener implements ActionListener {
     String validade = produtoPrincipal.getTextValidade().getText();
     int quantidadeEstoque = Integer.parseInt(produtoPrincipal.getTextQuantidadeEstoque().getText());
 
+    // if(!verificarData(validade)) {
+    //   return;
+    // }
+
     // Criar objeto DadosProduto e definir os dados do produto
-    DadosProduto produto = new DadosProduto();
+    Produto produto = new Produto();
     produto.setNome(nome);
     produto.setTipo(tipo);
     produto.setPrecoCompra(precoCompra);
@@ -35,13 +44,37 @@ public class ButtonProdutoSalvarListener implements ActionListener {
     produto.setValidade(validade);
     produto.setQuantidadeEstoque(quantidadeEstoque);
 
-    // Aqui você pode adicionar lógica para salvar os dados em outro formato ou
-    // local, se necessário
-    // Por exemplo, salvar em um banco de dados ou enviar para um serviço web
+    ProdutoDatabase produtoDatabase = new ProdutoDatabase();
+    produtoDatabase.cadastrarProduto(produto);
 
     // Exibir mensagem de sucesso ou falha
     JOptionPane.showMessageDialog(produtoPrincipal, "Produto salvo com sucesso!", "Resultado",
         JOptionPane.INFORMATION_MESSAGE);
-    // Atualizar tabela na interface, se necessário
+    produtoPrincipal.atualizarTabela();
+  }
+
+  private boolean verificarData(String validade) {
+    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy"); // Defina o formato da data
+    Date dataValidade = null;
+    try {
+        dataValidade = formatter.parse(validade);
+    } catch (ParseException error) {
+      error.printStackTrace();
+      JOptionPane.showMessageDialog(produtoPrincipal, "Data de validade inválida!",
+              "Erro de validação", JOptionPane.ERROR_MESSAGE);
+      return false;
+    }
+
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(new Date()); // Define a data atual
+    cal.add(Calendar.MONTH, 1); // Adiciona um mês
+    Date dataUmMesDepois = cal.getTime();
+    if (dataValidade.before(dataUmMesDepois)) {
+      JOptionPane.showMessageDialog(produtoPrincipal, "A data de validade é inferior à data de um mês a partir de agora.",
+              "Erro de validação", JOptionPane.ERROR_MESSAGE);
+      return false;
+    } else {
+      return true;
+    }
   }
 }

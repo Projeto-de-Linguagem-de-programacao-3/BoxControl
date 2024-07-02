@@ -1,21 +1,28 @@
 package main.model.entity;
 
+public class Pedido {
 
-
-public class DadosPedidos {
-
-    private String produto;
+    private int id;
+    private int produto;
     private double precoCompra;
     private String fabricante;
     private String validade;
     private int quantidade;
 
     // Getters e Setters
-    public String getProduto() {
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getProduto() {
         return produto;
     }
 
-    public void setProduto(String produto) {
+    public void setProduto(int produto) {
         this.produto = produto;
     }
 
@@ -50,7 +57,4 @@ public class DadosPedidos {
     public void setQuantidade(int quantidade) {
         this.quantidade = quantidade;
     }
-
-    // Método para imprimir os detalhes do pedido em um arquivo de texto
-
 }

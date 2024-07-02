@@ -1,7 +1,7 @@
 package main.model.entity;
 
 
-public class DadosFinanceiro {
+public class ItemPedido {
   private String compraProdutos;
   private String vendas;
   private String lucroBruto;

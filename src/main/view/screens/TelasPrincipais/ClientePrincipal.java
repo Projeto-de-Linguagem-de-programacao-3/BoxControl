@@ -5,11 +5,16 @@ import javax.swing.table.*;
 import javax.swing.text.*;
 import main.view.components.StyleGuide;
 import main.controller.actions.ButtonClientesSalvarListener;
+import main.model.database.ClienteDatabase;
+
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.List;
 
 
 public class ClientePrincipal extends JPanel {
@@ -22,7 +27,7 @@ public class ClientePrincipal extends JPanel {
   private JLabel labelNascimento;
   private JFormattedTextField textNascimento;
   private JLabel labelCredito;
-  private JTextField textCredito;
+  private JFormattedTextField textCredito;
   private JTable tabelaCliente;
   private JButton btnSalvar;
 
@@ -178,9 +183,11 @@ public class ClientePrincipal extends JPanel {
     return labelCredito;
   }
 
-  public JTextField getTextCredito() {
+  public JFormattedTextField getTextCredito() {
     if (textCredito == null) {
-      NumberFormatter numberFormatter = new NumberFormatter();
+      NumberFormat numberFormat = NumberFormat.getNumberInstance();
+      numberFormat.setGroupingUsed(false);
+      NumberFormatter numberFormatter = new NumberFormatter(numberFormat);
       numberFormatter.setValueClass(Double.class);
       numberFormatter.setAllowsInvalid(false);
       numberFormatter.setMinimum(0.0);
@@ -202,8 +209,13 @@ public class ClientePrincipal extends JPanel {
 
   public JTable getTabelaCliente() {
     if (tabelaCliente == null) {
-      String[] titulos = { "ID", "Nome", "CPF", "RG", "Data de Nascimento", "Limite de Crédito" };
-      DefaultTableModel modelo = new DefaultTableModel(titulos, 0);
+      String[] titulos = { "ID", "Nome", "CPF", "RG", "Data de Nascimento", "Limite de Crédito", "Estado" };
+      DefaultTableModel modelo = new DefaultTableModel(titulos, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+          return false;
+        }
+      };
       tabelaCliente = new JTable(modelo);
     }
     return tabelaCliente;
@@ -212,16 +224,11 @@ public class ClientePrincipal extends JPanel {
   public void atualizarTabela() {
     DefaultTableModel modelo = (DefaultTableModel) getTabelaCliente().getModel();
     modelo.setRowCount(0); // Limpa a tabela antes de adicionar novos dados
-
-    // Aqui você pode carregar os dados dos clientes de uma fonte de dados, como um
-    // banco de dados
-    // ou, se necessário, de um arquivo (como no exemplo anterior)
-
-    // Exemplo de dados fictícios para preenchimento inicial da tabela
-    Object[] dadosCliente1 = { 1, "João da Silva", "123.456.789-00", "12.345.678-9", "01/01/1980", 1000.0 };
-    Object[] dadosCliente2 = { 2, "Maria Oliveira", "987.654.321-00", "98.765.432-1", "15/06/1990", 1500.0 };
-
-    modelo.addRow(dadosCliente1);
-    modelo.addRow(dadosCliente2);
+    
+    ClienteDatabase clienteDatabase = new ClienteDatabase();
+    List<Object[]> dadosCliente = clienteDatabase.consultarClientes();
+    for (Object[] linha : dadosCliente) {
+      modelo.addRow(linha);
+    }
   }
 }

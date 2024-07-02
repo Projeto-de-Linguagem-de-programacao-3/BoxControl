@@ -6,7 +6,12 @@ import java.util.Map;
 
 import javax.swing.JOptionPane;
 
-import main.model.entity.DadosVendas;
+import com.mysql.cj.xdevapi.Client;
+
+import main.model.database.VendasDatabase;
+import main.model.entity.Cliente;
+import main.model.entity.Produto;
+import main.model.entity.Vendas;
 import main.view.screens.TelasPrincipais.VendasPrincipal;
 
 public class ButtonVendasSalvarListener implements ActionListener {
@@ -19,23 +24,40 @@ public class ButtonVendasSalvarListener implements ActionListener {
   @Override
   public void actionPerformed(ActionEvent e) {
     // Obter os dados inseridos pelo usuário
-    String cliente = (String) vendasPrincipal.getComboBoxCliente().getSelectedItem();
-    String produtosQuantidadeTexto = vendasPrincipal.getTextProdutosQuantidade().getText();
+    Cliente cliente = (Cliente) vendasPrincipal.getComboBoxCliente().getSelectedItem();
+    Produto produto = (Produto) vendasPrincipal.getComboBoxProdutos().getSelectedItem();
+    String quantidade = vendasPrincipal.getTextQuantidade().getText();
     String formaPagamento = (String) vendasPrincipal.getComboBoxFormaPagamento().getSelectedItem();
     String valorTotalTexto = vendasPrincipal.getTextValorTotal().getText();
-
-    // Converter o texto em um mapa de produtos e quantidades
-    Map<String, Integer> produtosQuantidade = vendasPrincipal.converterParaMapa(produtosQuantidadeTexto);
-
+    Double valorTotal = 0.00;
+    valorTotalTexto = valorTotalTexto.replace(",", ".");
     // Converter o texto em um Double para o valor total
-    Double valorTotal = Double.parseDouble(valorTotalTexto);
+    try {
+      valorTotal = Double.parseDouble(valorTotalTexto);
+    } catch (Exception error) {
+      JOptionPane.showMessageDialog(vendasPrincipal, "O cliente não pode comprar fiado!",
+              "Erro de validação", JOptionPane.ERROR_MESSAGE);
+      return;
+    }
+    int quantidadeInt = Integer.parseInt(quantidade);
+    if(quantidadeInt > produto.getQuantidadeEstoque()) {
+      JOptionPane.showMessageDialog(vendasPrincipal, "Estoque insuficiente! O pedido pode ter no máximo: " + produto.getQuantidadeEstoque(),
+              "Erro de validação", JOptionPane.ERROR_MESSAGE);
+      return;
+    }
 
     // Criar objeto DadosVendas e definir os dados da venda
-    DadosVendas vendas = new DadosVendas();
+    Vendas vendas = new Vendas();
     vendas.setCliente(cliente);
-    vendas.setProdutosQuantidade(produtosQuantidade);
+    vendas.setProduto(produto);
+    vendas.SetQuantidade(quantidade);
     vendas.setFormaPagamento(formaPagamento);
     vendas.setValorTotal(valorTotal);
+
+    VendasDatabase vendasDatabase = new VendasDatabase();
+    vendasDatabase.cadastrarVenda(vendas);
+    System.out.println(vendas.getId());
+    vendasDatabase.cadastrarItemVenda(vendas);
 
     // Aqui você pode adicionar lógica para salvar os dados em outro formato ou
     // local, se necessário

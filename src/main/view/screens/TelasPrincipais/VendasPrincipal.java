@@ -11,6 +11,7 @@ import main.model.database.ClienteDatabase;
 import main.model.database.ProdutoDatabase;
 import main.model.database.VendasDatabase;
 import main.model.entity.Cliente;
+import main.model.entity.ItemVenda;
 import main.model.entity.Produto;
 import main.view.components.StyleGuide;
 
@@ -24,6 +25,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 // import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,9 +33,10 @@ import java.util.List;
 import java.util.Map;
 
 public class VendasPrincipal extends JPanel {
-  private JComboBox<Produto> comboBoxProdutos;
-  private JFormattedTextField textQuantidade;
-  // private CaixaProdutos caixaProdutos;
+  // Databases que serão usadas
+  private ClienteDatabase clienteDatabase = new ClienteDatabase();
+  private ProdutoDatabase produtoDatabase = new ProdutoDatabase();
+
   private JComboBox<Cliente> comboBoxCliente;
   private JComboBox<String> comboBoxFormaPagamento;
   private JFormattedTextField textValorTotal;
@@ -45,23 +48,20 @@ public class VendasPrincipal extends JPanel {
   private JLabel labelValorTotal;
 
   private JButton btnSalvar;
-
+  private JButton btnAtualizarListas;
+  private JButton btnEstornarCompra;
   private JTable tabelaCliente;
 
-  private ClienteDatabase clienteDatabase = new ClienteDatabase();
-  private ProdutoDatabase produtoDatabase = new ProdutoDatabase();
-
   // Elementos Caixa Produtos
-  JComponent caixaProdutos = new JPanel();
   JPanel painelEsquerda;
   JPanel painelDireita;
   private JLabel labelDisponiveis;
-  private JList listDisponiveis;
-  private DefaultListModel<String> modelDisponiveis;
+  private JList<Produto> listDisponiveis;
+  private DefaultListModel<Produto> produtoDisponiveis;
   private JButton btnAdicionar;
   private JLabel labelSelecionadas;
-  private JList listSelecionadas;
-  private DefaultListModel<String> modelSelecionadas;
+  private JList<ItemVenda> listSelecionadas;
+  private DefaultListModel<ItemVenda> itensSelecionados;
   private JButton btnRemover;
 
   public VendasPrincipal() {
@@ -72,33 +72,7 @@ public class VendasPrincipal extends JPanel {
     constraints.weightx = 1;
     constraints.weighty = 1;
     constraints.fill = GridBagConstraints.HORIZONTAL;
-    constraints.insets = new Insets(10, 10, 10, 10);
-
-    ActionListener atualizarValorTotal = new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-          try {
-              int quantidade = Integer.parseInt(textQuantidade.getText());
-              Produto produtoSelecionado = (Produto) comboBoxProdutos.getSelectedItem();
-              Cliente clienteSelecionado = (Cliente) comboBoxCliente.getSelectedItem();
-              String formaPagamento = (String) comboBoxFormaPagamento.getSelectedItem();
-              if (produtoSelecionado != null && clienteSelecionado != null) {
-                  double valorTotal = quantidade * produtoSelecionado.getPrecoVenda();
-                  if ("À vista".equals(formaPagamento)) {
-                    valorTotal *= 0.98; // Aplicar 2% de desconto
-                  } else if ("Fiado".equals(formaPagamento)) {
-                      if (valorTotal > clienteSelecionado.getLimiteCredito()) {
-                          textValorTotal.setText("Limite insuficiente!");
-                          return;
-                      }
-                  }
-                  textValorTotal.setText(String.format("%.2f", valorTotal));
-              }
-          } catch (NumberFormatException ex) {
-            textValorTotal.setText("0.00");
-          }
-      }
-    };
+    constraints.insets = new Insets(5, 10, 5, 10);
 
     constraints.gridx = 0;
     constraints.gridy = 0;
@@ -113,21 +87,63 @@ public class VendasPrincipal extends JPanel {
 
     constraints.gridx = 0;
     constraints.gridy = 3;
-    add(getComboBoxProdutos(), constraints);
+    add(getPainelEsquerda(), constraints);
 
     constraints.gridx = 0;
     constraints.gridy = 4;
-    add(getLabelQuantidade(), constraints);
+    add(getPainelDireita(), constraints);
+
+    btnAdicionar.addActionListener( (ActionEvent e)->{
+      List<Produto> selecionadas = listDisponiveis.getSelectedValuesList();
+      for(int i =0;i<selecionadas.size();i++){
+          Produto produto = selecionadas.get(i);
+          ItemVenda itemVenda = new ItemVenda();
+          itemVenda.setProduto(produto);
+          int valorNumerico = 0;
+          boolean valorValido = false;
+          while (!valorValido) {
+              String valorInserido = JOptionPane.showInputDialog(null, "Digite a quantidade desse produto:", "Entrada de Valor", JOptionPane.QUESTION_MESSAGE);
+              if (valorInserido != null) {
+                  try {
+                      valorNumerico = Integer.parseInt(valorInserido);
+                      if (valorNumerico <= 0) {
+                        JOptionPane.showMessageDialog(null, "O valor não pode ser negativo.", "Erro", JOptionPane.ERROR_MESSAGE);
+                      } else if (valorNumerico > itemVenda.getProduto().getQuantidadeEstoque()) {
+                          JOptionPane.showMessageDialog(null, "O valor não pode ser maior que a quantidade existente.", "Erro", JOptionPane.ERROR_MESSAGE);
+                      } else {
+                          valorValido = true;
+                      }
+                  } catch (NumberFormatException error) {
+                      JOptionPane.showMessageDialog(null, "Por favor, insira um valor numérico válido.", "Erro", JOptionPane.ERROR_MESSAGE);
+                  }
+              } else {
+                  JOptionPane.showMessageDialog(null, "Entrada cancelada.", "Informação", JOptionPane.INFORMATION_MESSAGE);
+                  return;
+              }
+          }
+          itemVenda.setQuantidade(valorNumerico);
+          System.out.println(itemVenda.getQuantidade());
+          itensSelecionados.addElement(itemVenda);
+          produtoDisponiveis.removeElement(produto);
+          getValorProdutos();
+      }
+    });
+    btnRemover.addActionListener((ActionEvent e)->{
+        List<ItemVenda> selecionadas = listSelecionadas.getSelectedValuesList();
+        for(int i=0;i<selecionadas.size();i++){
+            ItemVenda itemVenda = selecionadas.get(i);
+            Produto produto = itemVenda.getProduto();
+            produtoDisponiveis.addElement(produto);
+            itensSelecionados.removeElement(itemVenda);
+        }
+    });
+    carregaProdutos();
 
     constraints.gridx = 0;
     constraints.gridy = 5;
-    add(getTextQuantidade(), constraints);
-
-    constraints.gridx = 0;
-    constraints.gridy = 6;
     add(getLabelFormaPagamento(), constraints);
     constraints.gridx = 0;
-    constraints.gridy = 7;
+    constraints.gridy = 6;
     add(getComboBoxFormaPagamento(), constraints);
 
     constraints.gridx = 0;
@@ -145,55 +161,47 @@ public class VendasPrincipal extends JPanel {
 
     constraints.gridx = 2;
     constraints.gridy = 0;
+    add(getBtnAtualizarListas(), constraints);
+    btnAtualizarListas.addActionListener((ActionEvent e) -> {
+      carregarCliente();
+      carregaProdutos();
+    });
+
+    constraints.gridx = 2;
+    constraints.gridy = 1;
     constraints.gridwidth = 2;
     constraints.gridheight = 9;
     JScrollPane scrollPane = new JScrollPane(getTabelaCliente());
     scrollPane.setMinimumSize(new Dimension(100, 500));
     add(scrollPane, constraints);
 
-    textQuantidade.getDocument().addDocumentListener(new DocumentListener() {
-      @Override
-      public void insertUpdate(DocumentEvent e) {
-        atualizarValorTotal.actionPerformed(null);
+    constraints.gridx = 2;
+    constraints.gridy = 10;
+    add(getBtnEstornarCompra(), constraints);
+    btnEstornarCompra.addActionListener((ActionEvent e) -> {
+      int resposta = JOptionPane.showConfirmDialog(this, "Deseja estornar essa venda?", "Confirmação", JOptionPane.YES_NO_OPTION);
+      if(resposta == JOptionPane.YES_OPTION) {
+        int selectedRow = getTabelaCliente().getSelectedRow();
+        if(selectedRow == -1) {
+          JOptionPane.showMessageDialog(this, "Nenhuma venda selecionada!", "Erro de validação", JOptionPane.ERROR_MESSAGE);
+          return;
+        } else {
+          int venda = (Integer) getTabelaCliente().getModel().getValueAt(selectedRow, 0);
+          VendasDatabase vendasDatabase = new VendasDatabase();
+          ProdutoDatabase produtoDatabase = new ProdutoDatabase();
+          List<ItemVenda> produtosDaVenda = vendasDatabase.consultarItemVendas(venda);
+          System.out.println(produtosDaVenda);
+          // for(ItemVenda produtoVenda : produtosDaVenda) {
+          //   produtoDatabase.estornarCompra(produtoVenda.getQuantidade(), produtoVenda.getIdProduto());
+          // }
+          // vendasDatabase.deletaItemVenda(venda);
+          // vendasDatabase.deletaVenda(venda);
+          // atualizarTabela();
+        }
+      } else if (resposta == JOptionPane.NO_OPTION) {
+        return;
       }
-
-      @Override
-      public void removeUpdate(DocumentEvent e) {
-          atualizarValorTotal.actionPerformed(null);
-      }
-
-      @Override
-      public void changedUpdate(DocumentEvent e) {
-          atualizarValorTotal.actionPerformed(null);
-      }
-  });
-  comboBoxProdutos.addActionListener(atualizarValorTotal);
-  comboBoxCliente.addActionListener(atualizarValorTotal);
-  comboBoxFormaPagamento.addActionListener(atualizarValorTotal);
-
-  }
-
-  public JComboBox<Produto> getComboBoxProdutos() {
-    if (comboBoxProdutos == null) {
-      comboBoxProdutos = new JComboBox<>();
-      comboBoxProdutos.setFont(new Font("Tahoma", Font.PLAIN, 14));
-      carregarProdutos();
-    }
-    return comboBoxProdutos;
-  }
-
-  public JFormattedTextField getTextQuantidade() {
-    if (textQuantidade == null) {
-      NumberFormat numberFormat = NumberFormat.getNumberInstance();
-      numberFormat.setGroupingUsed(false);
-      NumberFormatter numberFormatter = new NumberFormatter(numberFormat);
-      numberFormatter.setValueClass(Double.class);
-      numberFormatter.setAllowsInvalid(false); // Não permite caracteres não numéricos
-      numberFormatter.setMinimum(0.0); // Define um valor mínimo
-      textQuantidade = new JFormattedTextField(numberFormatter);
-      StyleGuide.formataComponente(textQuantidade);
-    }
-    return textQuantidade;
+    });
   }
 
   public JComboBox<Cliente> getComboBoxCliente() {
@@ -271,20 +279,39 @@ public class VendasPrincipal extends JPanel {
     return btnSalvar;
   }
 
+  public JButton getBtnAtualizarListas() {
+    if(btnAtualizarListas == null) {
+        btnAtualizarListas = new JButton("Atualizar seletores");
+        StyleGuide.formataComponente(btnAtualizarListas);
+    }
+    return btnAtualizarListas;
+}
+
   public JTable getTabelaCliente() {
     if (tabelaCliente == null) {
-      String[] titulos = { "Cliente", "Produtos", "Quantidade", "Forma de Pagamento", "Valor Total" };
-      DefaultTableModel modelo = new DefaultTableModel(titulos, 0);
+      String[] titulos = { "ID", "Cliente", "Produtos", "Quantidade", "Forma de Pagamento", "Valor Total" };
+      DefaultTableModel modelo = new DefaultTableModel(titulos, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+          return false;
+        }
+      };
       tabelaCliente = new JTable(modelo);
       atualizarTabela();
     }
     return tabelaCliente;
   }
 
+  public JButton getBtnEstornarCompra() {
+    if(btnEstornarCompra == null) {
+      btnEstornarCompra = new JButton("Estornar Compra Selecionada");
+    }
+    return btnEstornarCompra;
+  }
+
   public void atualizarTabela() {
     DefaultTableModel modelo = (DefaultTableModel) getTabelaCliente().getModel();
     modelo.setRowCount(0); // Limpa a tabela antes de adicionar novos dados
-    
     VendasDatabase vendasDatabase = new VendasDatabase();
     List<Object[]> dadosCliente = vendasDatabase.consultarVendas();
     for (Object[] linha : dadosCliente) {
@@ -319,105 +346,106 @@ public class VendasPrincipal extends JPanel {
       comboBoxCliente.addItem(cliente);
     }  
   }
+  // ---------------------------------------------------------------------------------------
 
-  private void carregarProdutos() {
-    List<Produto> produtos = produtoDatabase.listarProdutosVenda();
-    comboBoxProdutos.removeAllItems();
-    for (Produto produto : produtos) {
-      comboBoxProdutos.addItem(produto);
-    }
+  public DefaultListModel<ItemVenda> getItensSelecionados() {
+    return itensSelecionados;
   }
 
-  // METODO PARA TENTAR COLOCAR VARIOS PRODUTOS
-  public void caixaProdutos() {
-    GridLayout gridLayout = new GridLayout(0, 2);
-    gridLayout.setHgap(15);
-    caixaProdutos.setLayout(gridLayout);
-
-    // inicializa os componentes
-    labelDisponiveis = new JLabel("Disciplinas disponíveis:");
-    //modelDisponiveis = new DefaultListModel<>();
-    // modelDisponiveis.addElement("Algoritmos");
-    // modelDisponiveis.addElement("Sistemas Operacionais");
-    // modelDisponiveis.addElement("Estruturas de Dados");
-    // modelDisponiveis.addElement("Armaz. de Informações");
-    // modelDisponiveis.addElement("Redes de Computadores");
-    // modelDisponiveis.addElement("Programação Web");
-    // modelDisponiveis.addElement("Banco de Dados");
-    //listDisponiveis = new JList(modelDisponiveis);
-    listDisponiveis.setVisibleRowCount(5);
-    listDisponiveis.setFixedCellWidth(200);
-    listDisponiveis.setFixedCellHeight(15);
-    listDisponiveis.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-    btnAdicionar = new JButton("adicionar >>");
-    btnAdicionar.addActionListener( (ActionEvent e)->{
-        List<String> selecionadas = listDisponiveis.getSelectedValuesList();
-        for(int i =0;i<selecionadas.size();i++){
-            String disciplina = selecionadas.get(i);
-            modelSelecionadas.addElement(disciplina);
-            modelDisponiveis.removeElement(disciplina);
-        }
-    });
-
-    labelSelecionadas = new JLabel("Disciplinas selecionadas:");
-    modelSelecionadas = new DefaultListModel<String>();
-    listSelecionadas = new JList(modelSelecionadas);
-    listSelecionadas.setVisibleRowCount(5);
-    listSelecionadas.setFixedCellWidth(200);
-    listSelecionadas.setFixedCellHeight(15);
-    listSelecionadas.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-    btnRemover = new JButton("<< remover");
-    btnRemover.addActionListener((ActionEvent e)->{
-        List<String> selecionadas = listSelecionadas.getSelectedValuesList();
-        for(int i=0;i<selecionadas.size();i++){
-            String disciplina = selecionadas.get(i);
-            modelDisponiveis.addElement(disciplina);
-            modelSelecionadas.removeElement(disciplina);
-        }
-    });
-
-    // configurar o layout da esquerda
-    painelEsquerda = new JPanel(new BorderLayout());
-    painelEsquerda.add(labelDisponiveis, BorderLayout.NORTH);
-    painelEsquerda.add(new JScrollPane(listDisponiveis), BorderLayout.CENTER);
-    painelEsquerda.add(btnAdicionar, BorderLayout.SOUTH);
-
-    // configurar o layout da direita
-    painelDireita = new JPanel(new BorderLayout());
-    painelDireita.add(labelSelecionadas, BorderLayout.NORTH);
-    painelDireita.add(new JScrollPane(listSelecionadas), BorderLayout.CENTER);
-    painelDireita.add(btnRemover, BorderLayout.SOUTH);
-
-    // adicionar os componentes
-    // caixaProdutos.add(painelEsquerda); // colocado na coluna 0
-    // caixaProdutos.add(painelDireita); // colocado na coluna 1
+  public JLabel getlabelDisponiveis() {
+    if(labelDisponiveis == null) {
+      labelDisponiveis = new JLabel("Produtos disponíveis:");
+    }
+    return labelDisponiveis;
   }
 
-  // METODO DE ADICAO DE UMA LISTA PARA OUTRA
-  public void eventoAdicao(ActionEvent e) {
-    // código que deve ser executado quando o btn adicionar for clicado
-    System.out.println("EVENTO ADIÇÃO");
-    // obter a lista de todos os elementos selecionados
-    List<String> selecionados = listDisponiveis.getSelectedValuesList();
-
-    // percorre toda a lista dos selecionados
-    for (int i = 0; i < selecionados.size(); i++) {
-        modelSelecionadas.addElement(selecionados.get(i));
-        modelDisponiveis.removeElement(selecionados.get(i));
+  public JLabel getLabelSelecionados() {
+    if(labelSelecionadas == null) {
+      labelSelecionadas = new JLabel("Produtos selecionados:");
     }
-}
+    return labelSelecionadas;
+  }
 
-// METODO DE REMOÇÃO DE UMA LISTA PARA OUTRA
-public void eventoRemocao(ActionEvent e) {
-    // código que deve ser executado quando o btn remover for clicado
-    System.out.println("EVENTO REMOÇÃO");
-    // obter a lista de todos os elementos selecionados
-    List<String> selecionados = listSelecionadas.getSelectedValuesList();
-
-    // percorre toda a lista dos selecionados
-    for (int i = 0; i < selecionados.size(); i++) {
-        modelDisponiveis.addElement(selecionados.get(i));
-        modelSelecionadas.removeElement(selecionados.get(i));
+  public JList<Produto> getListDisponiveis() {
+    if(listDisponiveis == null) {
+      produtoDisponiveis = new DefaultListModel<>();
+      listDisponiveis = new JList<Produto>(produtoDisponiveis);
+      listDisponiveis.setVisibleRowCount(5);
+      listDisponiveis.setFixedCellWidth(200);
+      listDisponiveis.setFixedCellHeight(15);
+      listDisponiveis.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
     }
-}
+    return listDisponiveis;
+  }
+
+  public JList<ItemVenda> getListSelecionadas() {
+    if(listSelecionadas == null) {
+      itensSelecionados = new DefaultListModel<ItemVenda>();
+      listSelecionadas = new JList<ItemVenda>(itensSelecionados);
+      listSelecionadas.setVisibleRowCount(5);
+      listSelecionadas.setFixedCellWidth(200);
+      listSelecionadas.setFixedCellHeight(15);
+      listSelecionadas.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+    }
+    return listSelecionadas;
+  }
+
+  public JButton getBtnAdicionar() {
+    if(btnAdicionar == null) {
+      btnAdicionar = new JButton("adicionar >>");
+    }
+    return btnAdicionar;
+  }
+
+  public JButton getBtnRemover() {
+    if(btnRemover == null) {
+      btnRemover = new JButton("<< remover");
+    }
+    return btnRemover;
+  }
+
+  public JPanel getPainelEsquerda() {
+    if(painelEsquerda == null) {
+      painelEsquerda = new JPanel(new BorderLayout());
+      painelEsquerda.add(getlabelDisponiveis(), BorderLayout.NORTH);
+      painelEsquerda.add(new JScrollPane(getListDisponiveis()), BorderLayout.CENTER);
+      painelEsquerda.add(getBtnAdicionar(), BorderLayout.SOUTH);
+    }
+    return painelEsquerda;
+  }
+
+  public JPanel getPainelDireita() {
+    if(painelDireita == null) {
+      painelDireita = new JPanel(new BorderLayout());
+      painelDireita.add(getLabelSelecionados(), BorderLayout.NORTH);
+      painelDireita.add(new JScrollPane(getListSelecionadas()), BorderLayout.CENTER);
+      painelDireita.add(getBtnRemover(), BorderLayout.SOUTH);
+    }
+    return painelDireita;
+  }
+
+  public void carregaProdutos() {
+    List<Produto> produtosQuery = produtoDatabase.listarProdutosVenda();
+    produtoDisponiveis.removeAllElements();
+    for (Produto produto : produtosQuery ) {
+      produtoDisponiveis.addElement(produto);
+    }
+    itensSelecionados.removeAllElements();
+  }
+
+  public void getValorProdutos() {
+    DefaultListModel<ItemVenda> itens = getItensSelecionados();
+    Double valorTotal = 0.00;
+    if(!itens.isEmpty()) {
+      List<ItemVenda> itemsSelecionados = new ArrayList<ItemVenda>();
+      for (int i = 0; i < itens.size(); i++) {
+        itemsSelecionados.add(itens.getElementAt(i));
+      }
+      for (ItemVenda itemVenda : itemsSelecionados ) {
+        Double valorItemVenda = itemVenda.getQuantidade() * itemVenda.getProduto().getPrecoVenda();
+        valorTotal += valorItemVenda;
+      }
+      textValorTotal.setValue(valorTotal);
+    }
+  }
 }

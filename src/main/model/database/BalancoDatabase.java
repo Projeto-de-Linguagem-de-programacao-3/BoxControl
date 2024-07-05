@@ -25,6 +25,8 @@ public class BalancoDatabase {
         String faturamento = rs.getString("faturamento");
         String lucro = rs.getString("lucro");
         balanco = new Balanco(numeroClientes, numeroProdutos, numeroVendas, estoqueTotal, gastoEstoque, gastoPedidos, gastoTotal, faturamento, lucro);
+        rs.close();
+        ps.close();
         return balanco;
       }
       return null;

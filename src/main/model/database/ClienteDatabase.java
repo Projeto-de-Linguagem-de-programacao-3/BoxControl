@@ -42,7 +42,6 @@ public class ClienteDatabase {
       ps.setString(4, dataFormatada);
       ps.setDouble(5, cliente.getLimiteCredito());
       ps.setString(6, "ativo");
-
       ps.execute();
       ps.close();
     } catch (Exception e) {
@@ -75,7 +74,7 @@ public class ClienteDatabase {
 
   public List<Cliente> listarClientesComboBox() {
     List<Cliente> clientes = new ArrayList<>();
-    String sql = "SELECT idCliente, nome, limiteCredito FROM Cliente ORDER BY idCliente";
+    String sql = "SELECT idCliente, nome, limiteCredito FROM Cliente WHERE estado = 'ativo' ORDER BY idCliente";
     PreparedStatement ps = null;
     try {
       ps = Conexao.getConexao().prepareStatement(sql);
@@ -98,5 +97,50 @@ public class ClienteDatabase {
       e.printStackTrace();
       return null;
     }
-  } 
+  }
+  
+  public boolean clienteExiste(String cpf, String rg) {
+    String sql = "SELECT COUNT(*) FROM cliente WHERE cpf = ? AND rg = ?";
+    PreparedStatement ps = null;
+    try {
+      ps = Conexao.getConexao().prepareStatement(sql);
+      ps.setString(1, cpf);
+      ps.setString(2, rg);
+      ResultSet rs = ps.executeQuery();
+      if(rs.next()) {
+        return rs.getInt(1) > 0;
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return false;
+  }
+
+  public void desativarCliente(int id) {
+    String sql = "UPDATE cliente SET estado = ? WHERE idCliente = ?";
+    PreparedStatement ps = null;
+    try {
+      ps = Conexao.getConexao().prepareStatement(sql);
+      ps.setString(1, "inativo");
+      ps.setInt(2, id);
+      ps.execute();
+      ps.close();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  public void ativarCliente(int id) {
+    String sql = "UPDATE cliente SET estado = ? WHERE idCliente = ?";
+    PreparedStatement ps = null;
+    try {
+      ps = Conexao.getConexao().prepareStatement(sql);
+      ps.setString(1, "ativo");
+      ps.setInt(2, id);
+      ps.execute();
+      ps.close();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 }

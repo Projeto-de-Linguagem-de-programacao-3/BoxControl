@@ -4,8 +4,6 @@ public class Vendas {
 
     private long id;
     private Cliente cliente;
-    private Produto produto;
-    private String quantidade;
     private String formaPagamento;
     private Double valorTotal;
 
@@ -23,22 +21,6 @@ public class Vendas {
 
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
-    }
-
-    public Produto getProduto() {
-        return produto;
-    }
-
-    public void setProduto(Produto produto) {
-        this.produto = produto;
-    }
-
-    public String getQuantidade() {
-        return quantidade;
-    }
-
-    public void SetQuantidade(String quantidade) {
-        this.quantidade = quantidade;
     }
 
     public String getFormaPagamento() {

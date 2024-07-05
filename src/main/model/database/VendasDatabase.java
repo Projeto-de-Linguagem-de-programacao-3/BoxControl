@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import main.model.connection.Conexao;
+import main.model.entity.Cliente;
+import main.model.entity.ItemVenda;
 import main.model.entity.Vendas;
 
 public class VendasDatabase {
@@ -37,20 +39,72 @@ public class VendasDatabase {
     }
   }
 
-  public void cadastrarItemVenda(Vendas venda) {
+  public void cadastrarItemVenda(ItemVenda itemVenda) {
     String sql = "INSERT INTO itemVenda (Produto_idProduto, Venda_idVenda, Quantidade) VALUES (?,?,?)";
     PreparedStatement ps = null;
     try {
       ps = Conexao.getConexao().prepareStatement(sql);
-      ps.setInt(1, venda.getProduto().getId());
-      ps.setLong(2, venda.getId());
-      ps.setString(3, venda.getQuantidade());
+      ps.setInt(1, itemVenda.getProduto().getId());
+      ps.setLong(2, itemVenda.getIdVenda());
+      ps.setDouble(3, itemVenda.getQuantidade());
       ps.execute();
-      int quantidadeCompra = Integer.parseInt(venda.getQuantidade());
-      int quantidadeNova = venda.getProduto().getQuantidadeEstoque() - quantidadeCompra;
+      int quantidadeCompra = (itemVenda.getQuantidade());
+      int quantidadeNova = itemVenda.getProduto().getQuantidadeEstoque() - quantidadeCompra;
       ProdutoDatabase produtoDatabase = new ProdutoDatabase();
-      produtoDatabase.compraFeita(venda.getProduto().getId(),quantidadeNova);
+      produtoDatabase.compraFeita(itemVenda.getProduto().getId(),quantidadeNova);
       ps.close();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  public List<ItemVenda> consultarItemVendas(int id) {
+    List<ItemVenda> produtos = new ArrayList<>();
+    String sql = "SELECT * FROM itemvenda WHERE Venda_idVenda = ?";
+    PreparedStatement ps = null;
+    try {
+      ps = Conexao.getConexao().prepareStatement(sql);
+      ps.setInt(1, id);
+      ResultSet rs = ps.executeQuery(sql);
+      while (rs.next()) {
+        int idProduto = rs.getInt("Produto_idProduto");
+        int idVenda = rs.getInt("Venda_idVenda");
+        int quantidade = rs.getInt("quantidade");
+
+        ItemVenda itemVenda = new ItemVenda();
+        itemVenda.setIdProduto(idProduto);
+        itemVenda.setIdVenda(idVenda);
+        itemVenda.setQuantidade(quantidade);
+        produtos.add(itemVenda);
+      }
+      ps.close();
+      rs.close();
+      return produtos;
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+
+  public void deletaItemVenda(int id) {
+    String sql = "DELETE FROM itemvenda WHERE Venda_idVenda = ?";
+    PreparedStatement ps = null;
+    try {
+      ps = Conexao.getConexao().prepareStatement(sql);
+      ps.setInt(1, id);
+      ps.execute();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  public void deletaVenda(int id) {
+    String sql = "DELETE FROM venda WHERE idVenda = ?";
+    PreparedStatement ps = null;
+    try {
+      ps = Conexao.getConexao().prepareStatement(sql);
+      ps.setInt(1, id);
+      ps.execute();
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -58,7 +112,7 @@ public class VendasDatabase {
 
   public List<Object[]> consultarVendas() {
     List<Object[]> linhas = new ArrayList<>();
-    String sql = "SELECT cliente.nome as cliente, produto.nome as produto, itemvenda.quantidade, venda.formaDePagamento, venda.ValorTotal FROM venda JOIN itemvenda ON (venda.idVenda = itemvenda.Venda_idVenda) JOIN produto ON (produto.idProduto = itemvenda.Produto_idProduto) JOIN cliente ON (venda.Cliente_idCliente = cliente.idCliente)";
+    String sql = "SELECT venda.idVenda, cliente.nome as cliente, COUNT(itemvenda.Produto_idProduto) as produto, SUM(itemvenda.quantidade) as quantidade, venda.formaDePagamento, venda.ValorTotal FROM venda JOIN itemvenda ON (venda.idVenda = itemvenda.Venda_idVenda) JOIN produto ON (produto.idProduto = itemvenda.Produto_idProduto) JOIN cliente ON (venda.Cliente_idCliente = cliente.idCliente) GROUP BY venda.idVenda";
     PreparedStatement ps = null;
     try {
       ps = Conexao.getConexao().prepareStatement(sql);

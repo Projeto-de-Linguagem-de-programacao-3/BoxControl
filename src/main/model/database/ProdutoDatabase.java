@@ -14,7 +14,7 @@ import main.model.entity.Produto;
 public class ProdutoDatabase {
   public void cadastrarProduto(Produto produto) {
     // Consulta SQL a ser feita
-    String sql = "INSERT INTO produto (nome, tipo, precoCompra, precoVenda, fabricante, validade, quantidadeEstoque) VALUES (?,?,?,?,?,?,?)";
+    String sql = "INSERT INTO produto (nome, tipo, precoCompra, precoVenda, fabricante, validade, quantidadeEstoque, estoqueInicial) VALUES (?,?,?,?,?,?,?,?)";
     
     // IMPORTANTE: Todas as datas no sql devem estar no formato ano/mes/dia.
     // O Código abaixo converte o formato 01/10/2004 para 2004/10/01
@@ -41,6 +41,7 @@ public class ProdutoDatabase {
       ps.setString(5, produto.getFabricante());
       ps.setString(6, dataFormatada);
       ps.setInt(7, produto.getQuantidadeEstoque());
+      ps.setInt(8, produto.getEstoqueInicial());
 
       ps.execute();
       ps.close();
@@ -65,6 +66,20 @@ public class ProdutoDatabase {
 
   public void compraFeita(int produtoId, int quantidade) {
     String sql = "UPDATE produto set quantidadeEstoque = ? WHERE idProduto = ?";
+    PreparedStatement ps = null;
+    try {
+      ps = Conexao.getConexao().prepareStatement(sql);
+      ps.setInt(1, quantidade);
+      ps.setInt(2, produtoId);
+      ps.execute();
+      ps.close();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  public void estornarCompra(int quantidade, int produtoId) {
+    String sql = "UPDATE produto set quantidadeEstoque = (quantidadeEstoque + ?) WHERE idProduto = ?";
     PreparedStatement ps = null;
     try {
       ps = Conexao.getConexao().prepareStatement(sql);

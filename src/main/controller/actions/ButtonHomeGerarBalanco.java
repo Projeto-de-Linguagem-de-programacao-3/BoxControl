@@ -18,6 +18,8 @@ public class ButtonHomeGerarBalanco implements ActionListener {
   public void actionPerformed(ActionEvent e) {
     BalancoDatabase balancoDatabase = new BalancoDatabase();
     Balanco balanco = balancoDatabase.consultaResumo();
+    homePrincipal.setBalanco(balanco);
+    homePrincipal.gerarBalanco();
     System.out.println("Numero de clientes:" + balanco.getNumeroClientes());
     System.out.println("Numero de produtos:" + balanco.getNumeroProdutos());
     System.out.println("Numero de vendas:" + balanco.getNumeroVendas());

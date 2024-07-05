@@ -1,6 +1,5 @@
 package main.model.entity;
 
-
 public class Cliente {
 
     private int id;
@@ -8,7 +7,7 @@ public class Cliente {
     private String cpf;
     private String rg;
     private String dataNascimento;
-    private double limiteCredito;
+    private Double limiteCredito;
 
     // Getters e Setters
 
@@ -52,12 +51,24 @@ public class Cliente {
         this.dataNascimento = dataNascimento;
     }
 
-    public double getLimiteCredito() {
+    public Double getLimiteCredito() {
         return limiteCredito;
     }
 
     public void setLimiteCredito(double limiteCredito) {
         this.limiteCredito = limiteCredito;
+    }
+
+    public boolean isValid() {
+        return !isNullOrEmpty(nome) && 
+               !isNullOrEmpty(cpf) && 
+               !isNullOrEmpty(rg) && 
+               !isNullOrEmpty(dataNascimento) && 
+               limiteCredito != null;
+    }
+
+    private boolean isNullOrEmpty(String str) {
+        return str == null || str.trim().isEmpty();
     }
 
     @Override

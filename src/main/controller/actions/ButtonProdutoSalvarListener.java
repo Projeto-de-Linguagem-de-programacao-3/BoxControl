@@ -30,9 +30,9 @@ public class ButtonProdutoSalvarListener implements ActionListener {
     String validade = produtoPrincipal.getTextValidade().getText();
     int quantidadeEstoque = Integer.parseInt(produtoPrincipal.getTextQuantidadeEstoque().getText());
 
-    // if(!verificarData(validade)) {
-    //   return;
-    // }
+    if(!verificarData(validade)) {
+      return;
+    }
 
     // Criar objeto DadosProduto e definir os dados do produto
     Produto produto = new Produto();
@@ -43,6 +43,7 @@ public class ButtonProdutoSalvarListener implements ActionListener {
     produto.setFabricante(fabricante);
     produto.setValidade(validade);
     produto.setQuantidadeEstoque(quantidadeEstoque);
+    produto.setEstoqueInicial(quantidadeEstoque);
 
     ProdutoDatabase produtoDatabase = new ProdutoDatabase();
     produtoDatabase.cadastrarProduto(produto);
@@ -54,7 +55,7 @@ public class ButtonProdutoSalvarListener implements ActionListener {
   }
 
   private boolean verificarData(String validade) {
-    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy"); // Defina o formato da data
+    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy"); // Defina o formato da data
     Date dataValidade = null;
     try {
         dataValidade = formatter.parse(validade);
@@ -70,7 +71,7 @@ public class ButtonProdutoSalvarListener implements ActionListener {
     cal.add(Calendar.MONTH, 1); // Adiciona um mês
     Date dataUmMesDepois = cal.getTime();
     if (dataValidade.before(dataUmMesDepois)) {
-      JOptionPane.showMessageDialog(produtoPrincipal, "A data de validade é inferior à data de um mês a partir de agora.",
+      JOptionPane.showMessageDialog(produtoPrincipal, "O produto deve ter pelo menos um mês de validade!",
               "Erro de validação", JOptionPane.ERROR_MESSAGE);
       return false;
     } else {

@@ -9,6 +9,7 @@ public class Produto {
     private String fabricante;
     private String validade;
     private int quantidadeEstoque;
+    private int estoqueInicial;
 
     public int getId() {
         return id;
@@ -74,9 +75,16 @@ public class Produto {
         this.quantidadeEstoque = quantidadeEstoque;
     }
 
+    public int getEstoqueInicial() {
+        return estoqueInicial;
+    }
+
+    public void setEstoqueInicial(int estoqueInicial) {
+        this.estoqueInicial = estoqueInicial;
+    }
+
     @Override
     public String toString() {
         return this.getNome();
     }
-
 }

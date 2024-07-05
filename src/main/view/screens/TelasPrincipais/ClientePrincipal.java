@@ -6,11 +6,13 @@ import javax.swing.text.*;
 import main.view.components.StyleGuide;
 import main.controller.actions.ButtonClientesSalvarListener;
 import main.model.database.ClienteDatabase;
+import main.model.entity.Cliente;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -30,6 +32,9 @@ public class ClientePrincipal extends JPanel {
   private JFormattedTextField textCredito;
   private JTable tabelaCliente;
   private JButton btnSalvar;
+  private JButton btnAtivarCliente;
+  private JButton btnDesativarCliente;
+  private JButton btnEditarCliente;
 
   public ClientePrincipal() {
     super();
@@ -91,6 +96,72 @@ public class ClientePrincipal extends JPanel {
     JScrollPane scrollPane = new JScrollPane(getTabelaCliente());
     scrollPane.setMinimumSize(new Dimension(100, 300));
     add(scrollPane, constraints);
+    getTabelaCliente().getSelectionModel().addListSelectionListener(e -> {
+      if (!e.getValueIsAdjusting()) {
+          int selectedRow = getTabelaCliente().getSelectedRow();
+          if (selectedRow != -1) {
+              Object id = getTabelaCliente().getValueAt(selectedRow, 0);
+              Object nome = getTabelaCliente().getValueAt(selectedRow, 1);
+              Object cpf = getTabelaCliente().getValueAt(selectedRow, 2);
+              Object rg = getTabelaCliente().getValueAt(selectedRow, 3);
+              Object nascimento = getTabelaCliente().getValueAt(selectedRow, 4);
+              Object credito = getTabelaCliente().getValueAt(selectedRow, 5);
+              
+              // Exemplo de preenchimento dos campos (adaptar conforme seus campos)
+              getTextNome().setText(nome.toString());
+              getTextCPF().setText(cpf.toString());
+              getTextRG().setText(rg.toString());
+              getTextNascimento().setText(nascimento.toString());
+              getTextCredito().setText(credito.toString());
+          }
+      }
+  });
+
+    constraints.gridx = 2;
+    constraints.gridy = 9;
+    constraints.gridwidth = 1;
+    add(getBtnAtivarCliente(),constraints);
+    btnAtivarCliente.addActionListener((ActionEvent e) -> {
+      int resposta = JOptionPane.showConfirmDialog(this, "Deseja ativar esse cliente?", "confirmação", JOptionPane.YES_NO_OPTION);
+      if(resposta == JOptionPane.YES_OPTION) {
+        int colunaSelecionada = getTabelaCliente().getSelectedRow();
+        if(colunaSelecionada == -1) {
+          JOptionPane.showMessageDialog(this, "Nenhum cliente selecionado!", "Erro de validação", JOptionPane.ERROR_MESSAGE);
+          return;
+        } else {
+          int id = (Integer) getTabelaCliente().getModel().getValueAt(colunaSelecionada, 0);
+          ClienteDatabase clienteDatabase = new ClienteDatabase();
+          clienteDatabase.ativarCliente(id);
+          JOptionPane.showMessageDialog(this, "Cliente ativado com sucesso!", "Resultado:",
+          JOptionPane.INFORMATION_MESSAGE);
+          atualizarTabela();
+        }
+      } else {
+        return;
+      }
+    });
+    constraints.gridx = 3;
+    constraints.gridy = 9;
+    add(getBtnDesativarCliente(),constraints);
+    btnDesativarCliente.addActionListener((ActionEvent e) -> {
+      int resposta = JOptionPane.showConfirmDialog(this, "Deseja desativar esse cliente?", "confirmação", JOptionPane.YES_NO_OPTION);
+      if(resposta == JOptionPane.YES_OPTION) {
+        int colunaSelecionada = getTabelaCliente().getSelectedRow();
+        if(colunaSelecionada == -1) {
+          JOptionPane.showMessageDialog(this, "Nenhum cliente selecionado!", "Erro de validação", JOptionPane.ERROR_MESSAGE);
+          return;
+        } else {
+          int id = (Integer) getTabelaCliente().getModel().getValueAt(colunaSelecionada, 0);
+          ClienteDatabase clienteDatabase = new ClienteDatabase();
+          clienteDatabase.desativarCliente(id);
+          JOptionPane.showMessageDialog(this, "Cliente desativado com sucesso!", "Resultado:",
+          JOptionPane.INFORMATION_MESSAGE);
+          atualizarTabela();
+        }
+      } else {
+        return;
+      }
+    });
 
     // Preencher a tabela inicialmente
     atualizarTabela();
@@ -191,7 +262,6 @@ public class ClientePrincipal extends JPanel {
       numberFormatter.setValueClass(Double.class);
       numberFormatter.setAllowsInvalid(false);
       numberFormatter.setMinimum(0.0);
-
       textCredito = new JFormattedTextField(numberFormatter);
       textCredito.setColumns(10); // Ajustar o tamanho como desejado
       StyleGuide.formataComponente(textCredito);
@@ -205,6 +275,27 @@ public class ClientePrincipal extends JPanel {
       StyleGuide.formataComponente(btnSalvar);
     }
     return btnSalvar;
+  }
+
+  public JButton getBtnAtivarCliente() {
+    if(btnAtivarCliente == null) {
+      btnAtivarCliente = new JButton("Ativar Cliente");
+    }
+    return btnAtivarCliente;
+  }
+
+  public JButton getBtnDesativarCliente() {
+    if(btnDesativarCliente == null) {
+      btnDesativarCliente = new JButton("Desativar Cliente");
+    }
+    return btnDesativarCliente;
+  }
+
+  public JButton getBtnEditarCliente() {
+    if(btnEditarCliente == null) {
+      btnEditarCliente = new JButton("Editar Cliente");
+    }
+    return btnEditarCliente;
   }
 
   public JTable getTabelaCliente() {

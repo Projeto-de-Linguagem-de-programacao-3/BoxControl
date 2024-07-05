@@ -6,7 +6,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.NumberFormatter;
 
-import main.controller.actions.ButtonVendasSalvarListener;
+import main.controller.actions.Inserir.ButtonVendasSalvarListener;
 import main.model.database.ClienteDatabase;
 import main.model.database.ProdutoDatabase;
 import main.model.database.VendasDatabase;
@@ -135,6 +135,7 @@ public class VendasPrincipal extends JPanel {
             Produto produto = itemVenda.getProduto();
             produtoDisponiveis.addElement(produto);
             itensSelecionados.removeElement(itemVenda);
+            getValorProdutos();
         }
     });
     carregaProdutos();
@@ -145,6 +146,9 @@ public class VendasPrincipal extends JPanel {
     constraints.gridx = 0;
     constraints.gridy = 6;
     add(getComboBoxFormaPagamento(), constraints);
+    comboBoxFormaPagamento.addActionListener((ActionEvent e) -> {
+      getValorProdutos();
+    });
 
     constraints.gridx = 0;
     constraints.gridy = 8;
@@ -190,13 +194,15 @@ public class VendasPrincipal extends JPanel {
           VendasDatabase vendasDatabase = new VendasDatabase();
           ProdutoDatabase produtoDatabase = new ProdutoDatabase();
           List<ItemVenda> produtosDaVenda = vendasDatabase.consultarItemVendas(venda);
+          int quantidadeNova;
           System.out.println(produtosDaVenda);
-          // for(ItemVenda produtoVenda : produtosDaVenda) {
-          //   produtoDatabase.estornarCompra(produtoVenda.getQuantidade(), produtoVenda.getIdProduto());
-          // }
-          // vendasDatabase.deletaItemVenda(venda);
-          // vendasDatabase.deletaVenda(venda);
-          // atualizarTabela();
+          for(ItemVenda produtoVenda : produtosDaVenda) {
+            quantidadeNova = produtoVenda.getProduto().getQuantidadeEstoque() + produtoVenda.getQuantidade();
+            produtoDatabase.estornarCompra(quantidadeNova, produtoVenda.getProduto().getId());
+          }
+          vendasDatabase.deletaItemVenda(venda);
+          vendasDatabase.deletaVenda(venda);
+          atualizarTabela();
         }
       } else if (resposta == JOptionPane.NO_OPTION) {
         return;
@@ -435,6 +441,7 @@ public class VendasPrincipal extends JPanel {
 
   public void getValorProdutos() {
     DefaultListModel<ItemVenda> itens = getItensSelecionados();
+    Cliente clienteSelecionado = (Cliente) comboBoxCliente.getSelectedItem();
     Double valorTotal = 0.00;
     if(!itens.isEmpty()) {
       List<ItemVenda> itemsSelecionados = new ArrayList<ItemVenda>();
@@ -445,7 +452,19 @@ public class VendasPrincipal extends JPanel {
         Double valorItemVenda = itemVenda.getQuantidade() * itemVenda.getProduto().getPrecoVenda();
         valorTotal += valorItemVenda;
       }
-      textValorTotal.setValue(valorTotal);
+      if(comboBoxFormaPagamento.getSelectedItem() == "À vista: 2% de desconto") {
+        valorTotal = valorTotal * 0.98;
+        textValorTotal.setValue(valorTotal);
+      } else if(comboBoxFormaPagamento.getSelectedItem() == "Cartão") {
+        textValorTotal.setValue(valorTotal);
+      } else if(comboBoxFormaPagamento.getSelectedItem() == "Fiado") {
+        if(valorTotal > clienteSelecionado.getLimiteCredito()) {
+          textValorTotal.setText("Limite insuficiente!");
+        } else {
+          textValorTotal.setValue(valorTotal);
+        }
+      }
+      
     }
   }
 }

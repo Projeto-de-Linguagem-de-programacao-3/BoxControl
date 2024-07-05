@@ -1,4 +1,4 @@
-package main.controller.actions;
+package main.controller.actions.Inserir;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -109,6 +109,7 @@ public class ButtonClientesSalvarListener implements ActionListener {
 
   private String converterStringParaDataValida(String dateString) {
     SimpleDateFormat formatoOrigem = new SimpleDateFormat("dd/MM/yyyy");
+    formatoOrigem.setLenient(false);
     Date data = null;
     try {
       data = formatoOrigem.parse(dateString);

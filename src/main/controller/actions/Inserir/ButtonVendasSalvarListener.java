@@ -1,4 +1,4 @@
-package main.controller.actions;
+package main.controller.actions.Inserir;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

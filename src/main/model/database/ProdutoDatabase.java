@@ -1,6 +1,7 @@
 package main.model.database;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,6 +10,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import main.model.connection.Conexao;
+import main.model.entity.Cliente;
 import main.model.entity.Produto;
 
 public class ProdutoDatabase {
@@ -50,6 +52,70 @@ public class ProdutoDatabase {
     }
   }
 
+  public void alterarProduto(Produto produto) {
+    String sql = "UPDATE Produto SET nome = ?, tipo = ?, precoCompra = ?, precoVenda = ?, fabricante = ?, validade = ? WHERE idProduto = ?";
+    PreparedStatement ps = null;
+    SimpleDateFormat formatoOrigem = new SimpleDateFormat("dd/MM/yyyy");
+    java.util.Date data = null;
+    try {
+        data = formatoOrigem.parse(produto.getValidade());
+    } catch (ParseException e) {
+        e.printStackTrace();
+    }
+    SimpleDateFormat formatoDestino = new SimpleDateFormat("yyyy/MM/dd");
+    String dataFormatada = formatoDestino.format(data);
+    try {
+      ps = Conexao.getConexao().prepareStatement(sql);
+      ps.setString(1, produto.getNome());
+      ps.setString(2, produto.getTipo());
+      ps.setDouble(3, produto.getPrecoCompra());
+      ps.setDouble(4, produto.getPrecoVenda());
+      ps.setString(5, produto.getFabricante());
+      ps.setString(6, dataFormatada);
+      ps.setInt(7, produto.getId());
+      ps.execute();
+      ps.close();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  public boolean produtoExiste(String nome, String tipo, String fabricante) {
+    String sql = "SELECT COUNT(*) FROM produto WHERE nome = ? AND tipo = ? AND fabricante = ?";
+    PreparedStatement ps = null;
+    try {
+      ps = Conexao.getConexao().prepareStatement(sql);
+      ps.setString(1, nome);
+      ps.setString(2, tipo);
+      ps.setString(3, fabricante);
+      ResultSet rs = ps.executeQuery();
+      if(rs.next()) {
+        return rs.getInt(1) > 0;
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return false;
+  }
+
+  public boolean editarProdutoExiste(String nome, String tipo, String fabricante, int id) {
+    String sql = "SELECT idProduto FROM produto WHERE nome = ? AND tipo = ? AND fabricante = ?";
+    PreparedStatement ps = null;
+    try {
+      ps = Conexao.getConexao().prepareStatement(sql);
+      ps.setString(1, nome);
+      ps.setString(2, tipo);
+      ps.setString(3, fabricante);
+      ResultSet rs = ps.executeQuery();
+      if(rs.next()) {
+        return rs.getInt(1) == id;
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return false;
+  }
+
   public void novoPedido(int produtoId, double quantidade) {
     String sql = "UPDATE produto set quantidadeEstoque = ? WHERE idProduto = ?";
     PreparedStatement ps = null;
@@ -61,6 +127,28 @@ public class ProdutoDatabase {
       ps.close();
     } catch (Exception e) {
       e.printStackTrace();
+    }
+  }
+
+  public Produto consultaProdutoPedido(int produtoId) {
+    Produto produto = new Produto();
+    String sql = "SELECT idProduto, nome, quantidadeEstoque FROM produto WHERE idProduto = ?";
+    PreparedStatement ps = null;
+    try {
+      ps = Conexao.getConexao().prepareStatement(sql);
+      ps.setInt(1, produtoId);
+      ResultSet rs = ps.executeQuery();
+      rs.next();
+      int idProduto = rs.getInt("idProduto");
+      String nomeProduto = rs.getString("nome");
+      int quantidadeEstoque = rs.getInt("quantidadeEstoque");
+      produto.setId(idProduto);
+      produto.setNome(nomeProduto);
+      produto.setQuantidadeEstoque(quantidadeEstoque);
+      return produto;
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
     }
   }
 
@@ -79,7 +167,7 @@ public class ProdutoDatabase {
   }
 
   public void estornarCompra(int quantidade, int produtoId) {
-    String sql = "UPDATE produto set quantidadeEstoque = (quantidadeEstoque + ?) WHERE idProduto = ?";
+    String sql = "UPDATE produto set quantidadeEstoque = ? WHERE idProduto = ?";
     PreparedStatement ps = null;
     try {
       ps = Conexao.getConexao().prepareStatement(sql);
@@ -94,7 +182,7 @@ public class ProdutoDatabase {
 
   public List<Object[]> consultarProdutos() {
     List<Object[]> linhas = new ArrayList<>();
-    String sql = "SELECT * FROM Produto ORDER BY idProduto";
+    String sql = "SELECT idProduto, nome, tipo, precoCompra, precoVenda, fabricante, DATE_FORMAT(validade, '%d/%m/%Y'), quantidadeEstoque FROM Produto ORDER BY idProduto";
     PreparedStatement ps = null;
     try {
       ps = Conexao.getConexao().prepareStatement(sql);

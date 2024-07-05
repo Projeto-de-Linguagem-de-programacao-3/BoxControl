@@ -53,7 +53,7 @@ public class PedidoDatabase {
 
   public List<Object[]> consultarPedidos() {
     List<Object[]> linhas = new ArrayList<>();
-    String sql = "SELECT * FROM Pedidoproduto ORDER BY idPedidoProduto";
+    String sql = "SELECT idPedidoProduto, Produto_idProduto, precoCompra, fabricante, DATE_FORMAT(validade, '%d/%m/%Y'), quantidade FROM Pedidoproduto ORDER BY idPedidoProduto";
     PreparedStatement ps = null;
     try {
       ps = Conexao.getConexao().prepareStatement(sql);
@@ -71,6 +71,19 @@ public class PedidoDatabase {
     } catch (Exception e) {
       e.printStackTrace();
       return null;
+    }
+  }
+
+  public void deletaPedido(int id) {
+    String sql = "DELETE FROM pedidoproduto WHERE idPedidoProduto = ?";
+    PreparedStatement ps = null;
+    try {
+      ps = Conexao.getConexao().prepareStatement(sql);
+      ps.setInt(1, id);
+      ps.execute();
+      ps.close();
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 }

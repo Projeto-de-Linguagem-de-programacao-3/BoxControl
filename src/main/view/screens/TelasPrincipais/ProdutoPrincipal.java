@@ -5,7 +5,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.text.MaskFormatter;
 import javax.swing.text.NumberFormatter;
 
-import main.controller.actions.ButtonProdutoSalvarListener;
+import main.controller.actions.Editar.ButtonEditarProdutoListener;
+import main.controller.actions.Inserir.ButtonProdutoSalvarListener;
 import main.model.database.ProdutoDatabase;
 import main.view.components.StyleGuide;
 import java.awt.Dimension;
@@ -36,6 +37,7 @@ public class ProdutoPrincipal extends JPanel {
 
     private JButton btnSalvar;
     private JButton btnAtualizarTabela;
+    private JButton btnEditarProduto;
 
     private JTable tabelaProduto;
 
@@ -115,11 +117,41 @@ public class ProdutoPrincipal extends JPanel {
         constraints.gridx = 2;
         constraints.gridy = 1;
         constraints.gridwidth = 2;
-        constraints.gridheight = 14;
+        constraints.gridheight = 13;
         JScrollPane scrollPane = new JScrollPane(getTabelaProduto());
         scrollPane.setMinimumSize(new Dimension(100, 500));
         add(scrollPane, constraints);
+        getTabelaProduto().getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                int selectedRow = getTabelaProduto().getSelectedRow();
+                if (selectedRow != -1) {
+                    Object id = getTabelaProduto().getValueAt(selectedRow, 0);
+                    Object nome = getTabelaProduto().getValueAt(selectedRow, 1);
+                    Object tipo = getTabelaProduto().getValueAt(selectedRow, 2);
+                    Object precoCompra = getTabelaProduto().getValueAt(selectedRow, 3);
+                    Object precoVenda = getTabelaProduto().getValueAt(selectedRow, 4);
+                    Object fabricante = getTabelaProduto().getValueAt(selectedRow, 5);
+                    Object validade = getTabelaProduto().getValueAt(selectedRow, 6);
+                    Object quantidade = getTabelaProduto().getValueAt(selectedRow, 7);
+                    
+                    // Exemplo de preenchimento dos campos (adaptar conforme seus campos)
+                    getTextNome().setText(nome.toString());
+                    getTextTipo().setText(tipo.toString());
+                    getTextPrecoCompra().setText(precoCompra.toString());
+                    getTextPrecoVenda().setText(precoVenda.toString());
+                    getTextFabricante().setText(fabricante.toString());
+                    getTextValidade().setText(validade.toString());
+                    getTextQuantidadeEstoque().setText(quantidade.toString());
+                }
+            }
+        });
 
+        constraints.gridx = 2;
+        constraints.gridy = 14;
+        constraints.gridheight = 1;
+        add(getBtnEditarProduto(),constraints);
+        ButtonEditarProdutoListener buttonEditarProdutoListener = new ButtonEditarProdutoListener(this);
+        btnEditarProduto.addActionListener(buttonEditarProdutoListener);
         atualizarTabela();
     }
 
@@ -271,6 +303,14 @@ public class ProdutoPrincipal extends JPanel {
         }
         return btnAtualizarTabela;
     }
+
+    public JButton getBtnEditarProduto() {
+        if(btnEditarProduto == null) {
+            btnEditarProduto = new JButton("Editar Produto");
+          StyleGuide.formataComponente(btnEditarProduto);
+        }
+        return btnEditarProduto;
+      }
 
     public JTable getTabelaProduto() {
         if (tabelaProduto == null) {

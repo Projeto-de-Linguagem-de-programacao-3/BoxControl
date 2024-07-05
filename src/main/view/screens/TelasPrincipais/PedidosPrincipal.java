@@ -5,7 +5,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.text.MaskFormatter;
 import javax.swing.text.NumberFormatter;
 
-import main.controller.actions.ButtonPedidosSalvarListener;
+import main.controller.actions.Excluir.ButtonExcluirPedidoListener;
+import main.controller.actions.Inserir.ButtonPedidosSalvarListener;
 import main.model.database.PedidoDatabase;
 import main.model.database.ProdutoDatabase;
 import main.model.entity.Produto;
@@ -39,6 +40,7 @@ public class PedidosPrincipal extends JPanel {
 
     private JTable tabelaCliente;
     private JButton btnAtualizarProduto;
+    private JButton btnDeletarPedido;
 
     public PedidosPrincipal() {
         super();
@@ -103,10 +105,17 @@ public class PedidosPrincipal extends JPanel {
         constraints.gridx = 2;
         constraints.gridy = 1;
         constraints.gridwidth = 2;
-        constraints.gridheight = 10;
-        JScrollPane scrollPane = new JScrollPane(getTabelaCliente());
+        constraints.gridheight = 9;
+        JScrollPane scrollPane = new JScrollPane(getTabelaPedidos());
         scrollPane.setMinimumSize(new Dimension(100, 500));
         add(scrollPane, constraints);
+
+        constraints.gridx = 2;
+        constraints.gridy = 10;
+        constraints.gridheight = 1;
+        add(getBtnDeletarPedido(), constraints);
+        ButtonExcluirPedidoListener buttonExcluirPedidoListener = new ButtonExcluirPedidoListener(this);
+        btnDeletarPedido.addActionListener(buttonExcluirPedidoListener);
 
         atualizarTabela();
     }
@@ -224,7 +233,7 @@ public class PedidosPrincipal extends JPanel {
         return btnAtualizarProduto;
     }
 
-    public JTable getTabelaCliente() {
+    public JTable getTabelaPedidos() {
         if (tabelaCliente == null) {
             String[] titulos = { "ID", "Produto", "Preço de compra", "Fabricante", "Validade", "Quantidade" };
             DefaultTableModel modelo = new DefaultTableModel(titulos, 0) {
@@ -238,8 +247,16 @@ public class PedidosPrincipal extends JPanel {
         return tabelaCliente;
     }
 
+    public JButton getBtnDeletarPedido() {
+        if(btnDeletarPedido == null) {
+            btnDeletarPedido = new JButton("Devolver Pedido");
+            StyleGuide.formataComponente(btnDeletarPedido);
+        }
+        return btnDeletarPedido;
+    }
+
     public void atualizarTabela() {
-        DefaultTableModel modelo = (DefaultTableModel) getTabelaCliente().getModel();
+        DefaultTableModel modelo = (DefaultTableModel) getTabelaPedidos().getModel();
         modelo.setRowCount(0); // Limpa a tabela antes de adicionar novos dados
         
         PedidoDatabase pedidoDatabase = new PedidoDatabase();

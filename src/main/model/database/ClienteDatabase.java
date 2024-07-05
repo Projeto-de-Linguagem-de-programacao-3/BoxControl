@@ -49,9 +49,36 @@ public class ClienteDatabase {
     }
   }
 
+  public void alterarCliente(Cliente cliente) {
+    String sql = "UPDATE Cliente SET nome = ?, CPF = ?, RG = ?, DataNascimento = ?, LimiteCredito = ? WHERE idCliente = ?";
+    PreparedStatement ps = null;
+    SimpleDateFormat formatoOrigem = new SimpleDateFormat("dd/MM/yyyy");
+    Date data = null;
+    try {
+        data = formatoOrigem.parse(cliente.getDataNascimento());
+    } catch (ParseException e) {
+        e.printStackTrace();
+    }
+    SimpleDateFormat formatoDestino = new SimpleDateFormat("yyyy/MM/dd");
+    String dataFormatada = formatoDestino.format(data);
+    try {
+      ps = Conexao.getConexao().prepareStatement(sql);
+      ps.setString(1, cliente.getNome());
+      ps.setString(2, cliente.getCpf());
+      ps.setString(3, cliente.getRg());
+      ps.setString(4, dataFormatada);
+      ps.setDouble(5, cliente.getLimiteCredito());
+      ps.setInt(6, cliente.getId());
+      ps.execute();
+      ps.close();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
   public List<Object[]> consultarClientes() {
     List<Object[]> linhas = new ArrayList<>();
-    String sql = "SELECT * FROM Cliente ORDER BY idCliente";
+    String sql = "SELECT idCliente, nome, CPF, RG, DATE_FORMAT(DataNascimento, '%d/%m/%Y'), limiteCredito, estado FROM Cliente ORDER BY idCliente";
     PreparedStatement ps = null;
     try {
       ps = Conexao.getConexao().prepareStatement(sql);
@@ -109,6 +136,23 @@ public class ClienteDatabase {
       ResultSet rs = ps.executeQuery();
       if(rs.next()) {
         return rs.getInt(1) > 0;
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return false;
+  }
+
+  public boolean editarClienteExiste(String cpf, String rg, int id) {
+    String sql = "SELECT idCliente FROM cliente WHERE cpf = ? AND rg = ?";
+    PreparedStatement ps = null;
+    try {
+      ps = Conexao.getConexao().prepareStatement(sql);
+      ps.setString(1, cpf);
+      ps.setString(2, rg);
+      ResultSet rs = ps.executeQuery();
+      if(rs.next()) {
+        return rs.getInt(1) == id;
       }
     } catch (Exception e) {
       e.printStackTrace();

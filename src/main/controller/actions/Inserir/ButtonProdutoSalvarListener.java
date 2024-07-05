@@ -1,4 +1,4 @@
-package main.controller.actions;
+package main.controller.actions.Inserir;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,13 +22,31 @@ public class ButtonProdutoSalvarListener implements ActionListener {
 
   @Override
   public void actionPerformed(ActionEvent e) {
+    double precoCompra;
+    double precoVenda;
+    int quantidadeEstoque;
     String nome = produtoPrincipal.getTextNome().getText();
     String tipo = produtoPrincipal.getTextTipo().getText();
-    double precoCompra = Double.parseDouble(produtoPrincipal.getTextPrecoCompra().getText());
-    double precoVenda = Double.parseDouble(produtoPrincipal.getTextPrecoVenda().getText());
+    String quantidadeEstoqueTxt = produtoPrincipal.getTextQuantidadeEstoque().getText();
+    quantidadeEstoqueTxt = quantidadeEstoqueTxt.replace(".", "");
+    System.out.println(quantidadeEstoqueTxt);
+    try {
+      precoCompra = Double.parseDouble(produtoPrincipal.getTextPrecoCompra().getText());
+      precoVenda = Double.parseDouble(produtoPrincipal.getTextPrecoVenda().getText());
+      quantidadeEstoque = Integer.parseInt(quantidadeEstoqueTxt);
+    } catch (Exception error) {
+      JOptionPane.showMessageDialog(produtoPrincipal, "Preencha todos os valores!", "Erro de validação",
+        JOptionPane.ERROR_MESSAGE);
+        return;
+    }
     String fabricante = produtoPrincipal.getTextFabricante().getText();
     String validade = produtoPrincipal.getTextValidade().getText();
-    int quantidadeEstoque = Integer.parseInt(produtoPrincipal.getTextQuantidadeEstoque().getText());
+
+    if(nome.isEmpty() || tipo.isEmpty() || fabricante.isEmpty()) {
+      JOptionPane.showMessageDialog(produtoPrincipal, "Preencha todos os valores!", "Erro de validação",
+        JOptionPane.ERROR_MESSAGE);
+        return;
+    }
 
     if(!verificarData(validade)) {
       return;
@@ -46,6 +64,11 @@ public class ButtonProdutoSalvarListener implements ActionListener {
     produto.setEstoqueInicial(quantidadeEstoque);
 
     ProdutoDatabase produtoDatabase = new ProdutoDatabase();
+    if(produtoDatabase.produtoExiste(nome, tipo, fabricante)) {
+      JOptionPane.showMessageDialog(produtoPrincipal, "Nome, Tipo e fabricante ja exitem! Altere um desses dados", "Erro de validação",
+        JOptionPane.ERROR_MESSAGE);
+      return;
+    }
     produtoDatabase.cadastrarProduto(produto);
 
     // Exibir mensagem de sucesso ou falha
@@ -56,6 +79,7 @@ public class ButtonProdutoSalvarListener implements ActionListener {
 
   private boolean verificarData(String validade) {
     SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy"); // Defina o formato da data
+    formatter.setLenient(false);
     Date dataValidade = null;
     try {
         dataValidade = formatter.parse(validade);

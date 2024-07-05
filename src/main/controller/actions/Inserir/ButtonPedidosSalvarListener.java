@@ -1,4 +1,4 @@
-package main.controller.actions;
+package main.controller.actions.Inserir;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,11 +23,25 @@ public class ButtonPedidosSalvarListener implements ActionListener {
 
   @Override
   public void actionPerformed(ActionEvent e) {
+    double precoCompra;
+    int quantidade;
     Produto produto = (Produto) pedidosPrincipal.getTextProduto().getSelectedItem();
-    double precoCompra = Double.parseDouble(pedidosPrincipal.getTextPrecoCompra().getText());
     String fabricante = pedidosPrincipal.getTextFabricante().getText();
     String validade = pedidosPrincipal.getTextValidade().getText();
-    int quantidade = Integer.parseInt(pedidosPrincipal.getTextQuantidade().getText());
+    try {
+      precoCompra = Double.parseDouble(pedidosPrincipal.getTextPrecoCompra().getText());
+      quantidade = Integer.parseInt(pedidosPrincipal.getTextQuantidade().getText());
+    } catch (Exception error) {
+      JOptionPane.showMessageDialog(pedidosPrincipal, "Preencha todos os valores!", "Erro de validação",
+        JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    if(fabricante.isEmpty()) {
+      JOptionPane.showMessageDialog(pedidosPrincipal, "Preencha todos os valores!", "Erro de validação",
+        JOptionPane.ERROR_MESSAGE);
+      return;
+    }
 
     if(!verificarData(validade)) {
       return;
@@ -52,6 +66,7 @@ public class ButtonPedidosSalvarListener implements ActionListener {
 
   private boolean verificarData(String validade) {
     SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy"); // Defina o formato da data
+    formatter.setLenient(false);
     Date dataValidade = null;
     try {
         dataValidade = formatter.parse(validade);

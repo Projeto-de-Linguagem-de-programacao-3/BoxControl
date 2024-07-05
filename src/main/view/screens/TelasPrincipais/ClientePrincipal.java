@@ -4,7 +4,10 @@ import javax.swing.*;
 import javax.swing.table.*;
 import javax.swing.text.*;
 import main.view.components.StyleGuide;
-import main.controller.actions.ButtonClientesSalvarListener;
+import main.controller.actions.Editar.ButtonAtivarClienteListener;
+import main.controller.actions.Editar.ButtonEditarClienteListener;
+import main.controller.actions.Editar.ButttonDesativarClienteListener;
+import main.controller.actions.Inserir.ButtonClientesSalvarListener;
 import main.model.database.ClienteDatabase;
 import main.model.entity.Cliente;
 
@@ -92,7 +95,7 @@ public class ClientePrincipal extends JPanel {
     constraints.gridx = 2;
     constraints.gridy = 0;
     constraints.gridwidth = 2;
-    constraints.gridheight = 10;
+    constraints.gridheight = 9;
     JScrollPane scrollPane = new JScrollPane(getTabelaCliente());
     scrollPane.setMinimumSize(new Dimension(100, 300));
     add(scrollPane, constraints);
@@ -120,50 +123,22 @@ public class ClientePrincipal extends JPanel {
     constraints.gridx = 2;
     constraints.gridy = 9;
     constraints.gridwidth = 1;
+    constraints.gridheight = 1;
     add(getBtnAtivarCliente(),constraints);
-    btnAtivarCliente.addActionListener((ActionEvent e) -> {
-      int resposta = JOptionPane.showConfirmDialog(this, "Deseja ativar esse cliente?", "confirmação", JOptionPane.YES_NO_OPTION);
-      if(resposta == JOptionPane.YES_OPTION) {
-        int colunaSelecionada = getTabelaCliente().getSelectedRow();
-        if(colunaSelecionada == -1) {
-          JOptionPane.showMessageDialog(this, "Nenhum cliente selecionado!", "Erro de validação", JOptionPane.ERROR_MESSAGE);
-          return;
-        } else {
-          int id = (Integer) getTabelaCliente().getModel().getValueAt(colunaSelecionada, 0);
-          ClienteDatabase clienteDatabase = new ClienteDatabase();
-          clienteDatabase.ativarCliente(id);
-          JOptionPane.showMessageDialog(this, "Cliente ativado com sucesso!", "Resultado:",
-          JOptionPane.INFORMATION_MESSAGE);
-          atualizarTabela();
-        }
-      } else {
-        return;
-      }
-    });
+    ButtonAtivarClienteListener buttonAtivarClienteListener = new ButtonAtivarClienteListener(this);
+    btnAtivarCliente.addActionListener(buttonAtivarClienteListener);
     constraints.gridx = 3;
     constraints.gridy = 9;
     add(getBtnDesativarCliente(),constraints);
-    btnDesativarCliente.addActionListener((ActionEvent e) -> {
-      int resposta = JOptionPane.showConfirmDialog(this, "Deseja desativar esse cliente?", "confirmação", JOptionPane.YES_NO_OPTION);
-      if(resposta == JOptionPane.YES_OPTION) {
-        int colunaSelecionada = getTabelaCliente().getSelectedRow();
-        if(colunaSelecionada == -1) {
-          JOptionPane.showMessageDialog(this, "Nenhum cliente selecionado!", "Erro de validação", JOptionPane.ERROR_MESSAGE);
-          return;
-        } else {
-          int id = (Integer) getTabelaCliente().getModel().getValueAt(colunaSelecionada, 0);
-          ClienteDatabase clienteDatabase = new ClienteDatabase();
-          clienteDatabase.desativarCliente(id);
-          JOptionPane.showMessageDialog(this, "Cliente desativado com sucesso!", "Resultado:",
-          JOptionPane.INFORMATION_MESSAGE);
-          atualizarTabela();
-        }
-      } else {
-        return;
-      }
-    });
+    ButttonDesativarClienteListener butttonDesativarClienteListener = new ButttonDesativarClienteListener(this);
+    btnDesativarCliente.addActionListener(butttonDesativarClienteListener);
 
-    // Preencher a tabela inicialmente
+    constraints.gridx = 2;
+    constraints.gridwidth = 2;
+    constraints.gridy = 10;
+    add(getBtnEditarCliente(), constraints);
+    ButtonEditarClienteListener buttonEditarClienteListener = new ButtonEditarClienteListener(this);
+    btnEditarCliente.addActionListener(buttonEditarClienteListener);
     atualizarTabela();
   }
 
@@ -280,6 +255,7 @@ public class ClientePrincipal extends JPanel {
   public JButton getBtnAtivarCliente() {
     if(btnAtivarCliente == null) {
       btnAtivarCliente = new JButton("Ativar Cliente");
+      StyleGuide.formataComponente(btnAtivarCliente);
     }
     return btnAtivarCliente;
   }
@@ -287,6 +263,7 @@ public class ClientePrincipal extends JPanel {
   public JButton getBtnDesativarCliente() {
     if(btnDesativarCliente == null) {
       btnDesativarCliente = new JButton("Desativar Cliente");
+      StyleGuide.formataComponente(btnDesativarCliente);
     }
     return btnDesativarCliente;
   }
@@ -294,6 +271,7 @@ public class ClientePrincipal extends JPanel {
   public JButton getBtnEditarCliente() {
     if(btnEditarCliente == null) {
       btnEditarCliente = new JButton("Editar Cliente");
+      StyleGuide.formataComponente(btnEditarCliente);
     }
     return btnEditarCliente;
   }

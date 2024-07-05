@@ -9,6 +9,7 @@ import java.util.List;
 import main.model.connection.Conexao;
 import main.model.entity.Cliente;
 import main.model.entity.ItemVenda;
+import main.model.entity.Produto;
 import main.model.entity.Vendas;
 
 public class VendasDatabase {
@@ -60,25 +61,29 @@ public class VendasDatabase {
 
   public List<ItemVenda> consultarItemVendas(int id) {
     List<ItemVenda> produtos = new ArrayList<>();
-    String sql = "SELECT * FROM itemvenda WHERE Venda_idVenda = ?";
+    String sql = "SELECT Produto_idProduto, Venda_idVenda, quantidade, produto.nome as nome, produto.quantidadeEstoque as quantidadeEstoque FROM itemvenda JOIN produto ON (produto.idProduto = itemvenda.Produto_idProduto) WHERE Venda_idVenda = ?";
     PreparedStatement ps = null;
     try {
       ps = Conexao.getConexao().prepareStatement(sql);
       ps.setInt(1, id);
-      ResultSet rs = ps.executeQuery(sql);
+      ResultSet rs = ps.executeQuery();
       while (rs.next()) {
         int idProduto = rs.getInt("Produto_idProduto");
+        String nomeProduto = rs.getString("nome");
+        int estoqueProduto = rs.getInt("quantidadeEstoque");
         int idVenda = rs.getInt("Venda_idVenda");
         int quantidade = rs.getInt("quantidade");
 
         ItemVenda itemVenda = new ItemVenda();
-        itemVenda.setIdProduto(idProduto);
+        Produto produto = new Produto();
+        produto.setId(idProduto);
+        produto.setNome(nomeProduto);
+        produto.setQuantidadeEstoque(estoqueProduto);
+        itemVenda.setProduto(produto);
         itemVenda.setIdVenda(idVenda);
         itemVenda.setQuantidade(quantidade);
         produtos.add(itemVenda);
       }
-      ps.close();
-      rs.close();
       return produtos;
     } catch (Exception e) {
       e.printStackTrace();

@@ -36,6 +36,7 @@ public class ButtonVendasSalvarListener implements ActionListener {
     String valorTotalTexto = vendasPrincipal.getTextValorTotal().getText();
     double valorTotal = 0;
     valorTotalTexto = valorTotalTexto.replace(".", "");
+    valorTotalTexto = valorTotalTexto.replace(",", ".");
     try {
       valorTotal = Double.parseDouble(valorTotalTexto);
     } catch (Exception error) {
